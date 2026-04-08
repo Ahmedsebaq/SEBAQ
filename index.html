@@ -33,7 +33,7 @@
 
         #importScreen {
             background: linear-gradient(180deg, rgba(0,0,0,0.18), transparent 24%),
-                        url("./backgroumd word.svg") no-repeat center 14%;
+                        url("./backgroumdword.svg") no-repeat center 14%;
             background-size: 88% auto;
             display: flex;
             flex-direction: column;
@@ -1347,7 +1347,7 @@
 
         // ============ العودة للصفحة الرئيسية ============
         function goBackToImport() {
-            if (quizStarted && !confirm('هل تريد العودة لاختيار ملف آخر؟ سيتم فقدان الحالة الحالية.')) {
+            if (quizStarted && !confirm('هل تريد العودة للشاشة الرئيسية؟ سيتم فقدان الحالة الحالية.')) {
                 return;
             }
             resetAllState();
@@ -1827,9 +1827,8 @@
                 return;
             }
 
-            // تحديد المسار حسب الموقع
-            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            const baseUrl = isLocal ? './questions/' : 'https://raw.githubusercontent.com/lapshop/quiz-app/main/questions/';
+            // استخدام مسار نسبي إلى مجلد questions في نفس الموقع
+            const baseUrl = './questions/';
 
             try {
                 const response = await fetch(`${baseUrl}${selectedFile}`);
@@ -1865,6 +1864,69 @@
             }
         }
 
+        async function populateCloudSelect() {
+            const select = document.getElementById('cloudSelect');
+            if (!select) return;
+
+            select.innerHTML = '<option value="">اختر ملف...</option>';
+            const baseUrl = './questions/';
+
+            const addOption = (fileName, label) => {
+                if (!fileName || !fileName.endsWith('.json')) return;
+                let basename = fileName.split('/').pop().split('\\').pop();
+                try {
+                    basename = decodeURIComponent(basename);
+                } catch (decodeError) {
+                    // keep raw basename if decoding fails
+                }
+                const displayName = label || basename.replace(/\.json$/, '').replace(/[-_]/g, ' ');
+                const option = document.createElement('option');
+                option.value = basename;
+                option.textContent = displayName;
+                option.title = basename;
+                select.appendChild(option);
+            };
+
+            try {
+                const response = await fetch(baseUrl);
+                if (!response.ok) throw new Error('لا يمكن قراءة قائمة الملفات');
+
+                const contentType = response.headers.get('content-type') || '';
+                if (contentType.includes('text/html')) {
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const links = Array.from(doc.querySelectorAll('a[href]')).map(a => a.getAttribute('href'));
+                    const files = links
+                        .map(href => {
+                            try {
+                                return href ? decodeURIComponent(href) : href;
+                            } catch (innerError) {
+                                return href;
+                            }
+                        })
+                        .filter(href => href && href.endsWith('.json'));
+                    if (files.length > 0) {
+                        files.forEach(fileName => addOption(fileName));
+                        return;
+                    }
+                }
+
+                if (contentType.includes('application/json')) {
+                    const list = await response.json();
+                    if (Array.isArray(list)) {
+                        list.forEach(fileName => addOption(fileName));
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.log('populateCloudSelect failed:', e);
+            }
+
+            addOption('sample.json', 'أسئلة تجريبية');
+            addOption('general.json', 'أسئلة عامة');
+        }
+
         // ============ بدء الاختبار ============
         function startQuiz() {
             examMode = false;
@@ -1888,6 +1950,7 @@
         document.getElementById('importBtn').addEventListener('click', () => {
             document.getElementById('importBtn').style.display = 'none';
             document.getElementById('importOptions').style.display = 'flex';
+            populateCloudSelect();
         });
 
         document.getElementById('importLocalBtn').addEventListener('click', () => {
@@ -1901,6 +1964,7 @@
             document.getElementById('importCloudBtn').style.display = 'none';
             document.getElementById('cancelImportBtn').style.display = 'none';
             document.getElementById('cloudSubOptions').style.display = 'flex';
+            populateCloudSelect();
         });
 
         document.getElementById('importCloudConfirmBtn').addEventListener('click', () => {
@@ -2013,6 +2077,7 @@
             // إذا لم توجد بيانات محفوظة، أظهر شاشة الاستيراد
             document.getElementById('importScreen').style.display = 'flex';
             document.getElementById('quizMain').style.display = 'none';
+            populateCloudSelect();
         }
 
         // استدعاء التهيئة عند تحميل الصفحة
