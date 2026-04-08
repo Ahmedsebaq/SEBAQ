@@ -19,13 +19,54 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: radial-gradient(circle at top left, rgba(255,255,255,0.08), transparent 22%),
+                        radial-gradient(circle at bottom right, rgba(255,255,255,0.05), transparent 20%),
+                        linear-gradient(135deg, #2d1747 0%, #4a2d7f 45%, #6f5fd0 100%);
             min-height: 100dvh;
             padding: 6px 8px;
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            color: #fff;
+        }
+
+        #importScreen {
+            background: linear-gradient(180deg, rgba(0,0,0,0.18), transparent 24%),
+                        url("./backgroumdword.svg") no-repeat center 14%;
+            background-size: 88% auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 28px;
+            padding: 120px 20px 40px;
+            min-height: 100%;
+            position: relative;
+        }
+
+        #importScreen::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 90% 20%, rgba(255,255,255,0.14), transparent 20%),
+                        radial-gradient(circle at 15% 70%, rgba(255,255,255,0.08), transparent 14%);
+            pointer-events: none;
+        }
+
+        .app-title {
+            text-align: center;
+            color: white;
+            margin-bottom: 0;
+            animation: fadeIn 1s ease-in;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .app-title h1 {
+            font-size: clamp(1.6rem, 5vw, 2.6rem);
+            text-shadow: 2px 2px 14px rgba(0, 0, 0, 0.35);
+            margin-bottom: 4px;
         }
 
         /* تأثير الخلفية المتحركة */
@@ -120,21 +161,6 @@
             font-weight: bold;
         }
 
-        /* عنوان التطبيق */
-        .app-title {
-            text-align: center;
-            color: white;
-            margin-bottom: 0;
-            animation: fadeIn 1s ease-in;
-            flex-shrink: 0;
-        }
-
-        .app-title h1 {
-            font-size: clamp(1.15rem, 5vw, 1.75rem);
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
-            margin-bottom: 4px;
-        }
-
         .app-title p {
             font-size: clamp(0.75rem, 2.5vw, 0.9rem);
             opacity: 0.9;
@@ -142,27 +168,101 @@
         }
 
         .import-card {
-            background: rgba(255, 255, 255, 0.96);
-            border-radius: 14px;
-            padding: 14px 16px;
-            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 28px 26px;
+            box-shadow: 0 22px 70px rgba(0, 0, 0, 0.28);
             max-width: 420px;
+            width: 100%;
             margin: 0 auto;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(20px);
+            position: relative;
+            z-index: 1;
         }
 
         .import-card .import-actions {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-top: 12px;
+            gap: 16px;
+            margin-top: 22px;
+        }
+
+        .import-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .import-option-btn {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            color: #fff;
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        }
+
+        .import-option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+        }
+
+        .cloud-sub-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .cloud-select {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 0.95rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .cloud-select option {
+            background: #2d3748;
+            color: #fff;
         }
 
         .import-card input[type="file"] {
+            display: none;
+        }
+
+        .import-action-btn {
             width: 100%;
-            padding: 8px;
-            border-radius: 8px;
-            border: 2px solid #667eea;
-            font-size: 0.85rem;
+            margin: 0;
+            padding: 16px 18px;
+            border-radius: 18px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            border: none;
+            color: #fff;
+            background: linear-gradient(135deg, #6d5ad8 0%, #4d3ac0 100%);
+            box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        }
+
+        .import-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 22px 44px rgba(0, 0, 0, 0.32);
+        }
+
+        .import-action-btn:active {
+            transform: translateY(0);
         }
 
         /* بطاقة السؤال */
@@ -825,7 +925,22 @@
             <div class="import-card">
                 <input type="file" id="jsonFile" accept=".json" aria-label="اختر ملف JSON">
                 <div class="import-actions">
-                    <button type="button" id="importBtn" class="next-btn" style="margin: 0; width: 100%;">استيراد وبدء</button>
+                    <button type="button" id="importBtn" class="import-action-btn">استيراد الأسئلة</button>
+                    <div id="importOptions" class="import-options" style="display: none;">
+                        <button type="button" id="importLocalBtn" class="import-option-btn">📁 من الملفات</button>
+                        <button type="button" id="importCloudBtn" class="import-option-btn">☁️ من السحابة</button>
+                        <div id="cloudSubOptions" class="cloud-sub-options" style="display: none;">
+                            <label for="cloudSelect" style="color: #fff; font-size: 0.9rem; margin-bottom: 8px; display: block;">اختر ملف من السحابة:</label>
+                            <select id="cloudSelect" class="cloud-select">
+                                <option value="">اختر ملف...</option>
+                                <option value="sample.json">أسئلة تجريبية</option>
+                                <option value="general.json">أسئلة عامة</option>
+                            </select>
+                            <button type="button" id="importCloudConfirmBtn" class="import-option-btn" style="margin-top: 12px;">☁️ استيراد من السحابة</button>
+                            <button type="button" id="backToOptionsBtn" class="import-option-btn" style="background: linear-gradient(135deg, #718096 0%, #4a5568 100%); margin-top: 8px;">⬅️ رجوع</button>
+                        </div>
+                        <button type="button" id="cancelImportBtn" class="import-option-btn" style="background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);">❌ إلغاء</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -919,7 +1034,10 @@
     <button type="button" class="quiz-menu-fab" id="quizMenuFab" aria-label="قائمة الأسئلة والاختبار">☰</button>
     <div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
     <aside class="quiz-sidebar" id="quizSidebar" aria-hidden="true" dir="rtl">
-        <div class="sidebar-head">الأسئلة والاختبار</div>
+        <div class="sidebar-head" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>الأسئلة والاختبار</span>
+            <button type="button" id="backToImportBtn" style="background: rgba(255,255,255,0.2); border: none; color: #fff; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.9rem;" title="العودة لاختيار ملف آخر">← رجوع</button>
+        </div>
         <div class="sidebar-tabs">
             <button type="button" class="sidebar-tab active" data-side-tab="list">جميع الأسئلة</button>
             <button type="button" class="sidebar-tab" data-side-tab="exam">اختبار</button>
@@ -1015,6 +1133,7 @@
         let quizStarted = false;
         let examMode = false;
         let examAnswers = []; // سجل إجابات الامتحان لكل سؤال في الجلسة
+        let skipAutoResume = false; // لتجنب الاستئناف التلقائي بعد استيراد ملف جديد
 
         // ============ حفظ التقدم (لا يُحفظ أثناء وضع الامتحان) ============
         function saveProgress() {
@@ -1025,17 +1144,28 @@
                 wrongAnswers: wrongAnswers,
                 quizStarted: quizStarted,
                 questionsLength: questions.length,
-                bankLength: questionsBank.length
+                bankLength: questionsBank.length,
+                isExamData: false
             };
             localStorage.setItem('quizProgress', JSON.stringify(progress));
+            localStorage.setItem('quizBank', JSON.stringify(questionsBank));
         }
 
         // ============ تحميل التقدم ============
         function loadProgress() {
+            if (skipAutoResume) return false;
+            
             const saved = localStorage.getItem('quizProgress');
             if (saved) {
                 const progress = JSON.parse(saved);
                 const bankLen = progress.bankLength != null ? progress.bankLength : progress.questionsLength;
+                
+                // إذا كان البيانات المحفوظة من الامتحان، لا تستأنف - ابدأ من جديد
+                if (progress.isExamData) {
+                    clearProgress();
+                    return false;
+                }
+                
                 if (bankLen === questionsBank.length && progress.questionsLength === questions.length && !examMode) {
                     currentQuestion = progress.currentQuestion;
                     correctAnswers = progress.correctAnswers;
@@ -1050,6 +1180,7 @@
         // ============ مسح التقدم ============
         function clearProgress() {
             localStorage.removeItem('quizProgress');
+            localStorage.removeItem('quizBank');
             currentQuestion = 0;
             correctAnswers = 0;
             wrongAnswers = 0;
@@ -1214,6 +1345,19 @@
             closeQuizSidebar();
         }
 
+        // ============ العودة للصفحة الرئيسية ============
+        function goBackToImport() {
+            if (quizStarted && !confirm('هل تريد العودة لاختيار ملف آخر؟ سيتم فقدان الحالة الحالية.')) {
+                return;
+            }
+            resetAllState();
+            document.getElementById('quizMain').style.display = 'none';
+            document.getElementById('importScreen').style.display = 'flex';
+            document.getElementById('jsonFile').value = '';
+            hideQuizFab();
+            closeQuizSidebar();
+        }
+
         // ============ عرض السؤال ============
         function displayQuestion() {
             answered = false;
@@ -1290,19 +1434,15 @@
 
         // ============ فحص إجابات صح/خطأ ============
         function checkAnswerTF(selectedBool) {
-            if (answered) return;
-            answered = true;
-
             const question = questions[currentQuestion];
             const buttons = document.querySelectorAll('.answer-btn');
             const feedback = document.getElementById('feedback');
-
-            buttons.forEach(btn => btn.disabled = true);
 
             const isCorrect = question.correctTF === selectedBool;
 
             if (examMode) {
                 const selBtn = document.getElementById(`${question.id}_${selectedBool ? 'true' : 'false'}`);
+                buttons.forEach(btn => btn.classList.remove('exam-selected'));
                 if (selBtn) selBtn.classList.add('exam-selected');
                 examAnswers[currentQuestion] = { type: 'tf', selected: selectedBool, correct: isCorrect };
                 feedback.classList.remove('show', 'correct', 'wrong');
@@ -1315,6 +1455,10 @@
                 }
                 return;
             }
+
+            if (answered) return;
+            answered = true;
+            buttons.forEach(btn => btn.disabled = true);
 
             if (isCorrect) {
                 correctAnswers++;
@@ -1399,18 +1543,14 @@
 
         // ============ فحص الإجابة ============
         function checkAnswer(selectedIndex) {
-            if (answered) return;
-            answered = true;
-
             const question = questions[currentQuestion];
             const buttons = document.querySelectorAll('.answer-btn');
             const feedback = document.getElementById('feedback');
 
-            buttons.forEach(btn => btn.disabled = true);
-
             const isCorrect = selectedIndex === question.correctAnswer;
 
             if (examMode) {
+                buttons.forEach(btn => btn.classList.remove('exam-selected'));
                 if (buttons[selectedIndex]) buttons[selectedIndex].classList.add('exam-selected');
                 examAnswers[currentQuestion] = { type: 'mc', selected: selectedIndex, correct: isCorrect };
                 feedback.classList.remove('show', 'correct', 'wrong');
@@ -1423,6 +1563,10 @@
                 }
                 return;
             }
+
+            if (answered) return;
+            answered = true;
+            buttons.forEach(btn => btn.disabled = true);
 
             if (isCorrect) {
                 correctAnswers++;
@@ -1604,12 +1748,27 @@
             }
         }
 
+        // ============ مسح الحالة بالكامل ============
+        function resetAllState() {
+            questionsBank = [];
+            questions = [];
+            currentQuestion = 0;
+            correctAnswers = 0;
+            wrongAnswers = 0;
+            answered = false;
+            quizStarted = false;
+            examMode = false;
+            examAnswers = [];
+            skipAutoResume = true;
+            clearProgress();
+        }
+
         // ============ استيراد الأسئلة من JSON ============
         function importQuestions() {
             const fileInput = document.getElementById('jsonFile');
             const file = fileInput.files[0];
             if (!file) {
-                alert('⚠️ يرجى اختيار ملف JSON أولاً!');
+                fileInput.click();
                 return;
             }
 
@@ -1618,10 +1777,16 @@
                 try {
                     const imported = JSON.parse(e.target.result);
                     if (Array.isArray(imported) && imported.length > 0) {
+                        // مسح الحالة القديمة بالكامل
+                        resetAllState();
+                        skipAutoResume = true; // منع الاستئناف التلقائي عند الاستيراد الأول
+                        
+                        // تحميل البيانات الجديدة
                         questionsBank = imported;
                         questions = questionsBank.slice();
                         examMode = false;
                         examAnswers = [];
+                        localStorage.setItem('quizBank', JSON.stringify(questionsBank));
 
                         const hasProgress = loadProgress();
                         if (!hasProgress) {
@@ -1641,6 +1806,7 @@
                             document.getElementById('resumeText').textContent = `تم حفظ تقدم سابق (السؤال ${currentQuestion + 1}). هل تريد الاستئناف حيث توقفت؟`;
                         } else {
                             // بدء جديد مباشرة
+                            skipAutoResume = false; // فعّل الاستئناف التلقائي للمرات القادمة
                             startQuiz();
                         }
                     } else {
@@ -1651,6 +1817,52 @@
                 }
             };
             reader.readAsText(file);
+        }
+
+        // ============ استيراد من السحابة (مجلد محلي أو GitHub) ============
+        async function importFromCloud() {
+            const selectedFile = document.getElementById('cloudSelect').value;
+            if (!selectedFile) {
+                alert('يرجى اختيار ملف من القائمة.');
+                return;
+            }
+
+            // تحديد المسار حسب الموقع
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const baseUrl = isLocal ? './questions/' : 'https://raw.githubusercontent.com/lapshop/quiz-app/main/questions/';
+
+            try {
+                const response = await fetch(`${baseUrl}${selectedFile}`);
+                if (!response.ok) {
+                    alert('❌ خطأ في قراءة الملف المختار. تأكد من أن الملف موجود على GitHub.');
+                    return;
+                }
+                const imported = await response.json();
+                if (Array.isArray(imported) && imported.length > 0) {
+                    // مسح الحالة القديمة بالكامل
+                    resetAllState();
+                    skipAutoResume = true;
+                    
+                    // تحميل البيانات الجديدة
+                    questionsBank = imported;
+                    questions = questionsBank.slice();
+                    examMode = false;
+                    examAnswers = [];
+                    localStorage.setItem('quizBank', JSON.stringify(questionsBank));
+
+                    document.getElementById('importScreen').style.display = 'none';
+                    document.getElementById('quizMain').style.display = 'flex';
+                    showQuizFab();
+                    
+                    // بدء جديد مباشرة
+                    skipAutoResume = false;
+                    startQuiz();
+                } else {
+                    alert('❌ الملف لا يحتوي على أسئلة صحيحة.');
+                }
+            } catch (error) {
+                alert('❌ خطأ في قراءة الملف من السحابة: ' + error.message);
+            }
         }
 
         // ============ بدء الاختبار ============
@@ -1673,7 +1885,47 @@
         }
 
         // ============ ربط زر الاستيراد ============
-        document.getElementById('importBtn').addEventListener('click', importQuestions);
+        document.getElementById('importBtn').addEventListener('click', () => {
+            document.getElementById('importBtn').style.display = 'none';
+            document.getElementById('importOptions').style.display = 'flex';
+        });
+
+        document.getElementById('importLocalBtn').addEventListener('click', () => {
+            document.getElementById('importOptions').style.display = 'none';
+            document.getElementById('importBtn').style.display = 'block';
+            importQuestions();
+        });
+
+        document.getElementById('importCloudBtn').addEventListener('click', () => {
+            document.getElementById('importLocalBtn').style.display = 'none';
+            document.getElementById('importCloudBtn').style.display = 'none';
+            document.getElementById('cancelImportBtn').style.display = 'none';
+            document.getElementById('cloudSubOptions').style.display = 'flex';
+        });
+
+        document.getElementById('importCloudConfirmBtn').addEventListener('click', () => {
+            document.getElementById('importOptions').style.display = 'none';
+            document.getElementById('importBtn').style.display = 'block';
+            importFromCloud();
+        });
+
+        document.getElementById('backToOptionsBtn').addEventListener('click', () => {
+            document.getElementById('cloudSubOptions').style.display = 'none';
+            document.getElementById('importLocalBtn').style.display = 'block';
+            document.getElementById('importCloudBtn').style.display = 'block';
+            document.getElementById('cancelImportBtn').style.display = 'block';
+        });
+
+        document.getElementById('cancelImportBtn').addEventListener('click', () => {
+            document.getElementById('importOptions').style.display = 'none';
+            document.getElementById('importBtn').style.display = 'block';
+        });
+
+        document.getElementById('jsonFile').addEventListener('change', () => {
+            if (document.getElementById('jsonFile').files.length) {
+                importQuestions();
+            }
+        });
 
         // ============ ربط زر التالي ============
         document.getElementById('nextBtn').addEventListener('click', nextQuestion);
@@ -1681,13 +1933,17 @@
         // ============ ربط أزرار الاستئناف ============
         document.getElementById('resumeBtn').addEventListener('click', () => {
             // استئناف من حيث توقف
+            skipAutoResume = false; // فعّل الاستئناف التلقائي للمرات القادمة
             startQuiz();
         });
 
         document.getElementById('clearBtn').addEventListener('click', () => {
             clearProgress();
+            skipAutoResume = true; // منع الاستئناف التلقائي
             startQuiz();
         });
+
+        document.getElementById('backToImportBtn').addEventListener('click', goBackToImport);
 
         document.getElementById('quizMenuFab').addEventListener('click', () => openQuizSidebar());
         document.getElementById('sidebarBackdrop').addEventListener('click', closeQuizSidebar);
@@ -1706,6 +1962,61 @@
         });
 
         // ============ بدء التطبيق ============
+        function initializeApp() {
+            // محاولة تحميل بيانات محفوظة سابقة
+            const savedProgress = localStorage.getItem('quizProgress');
+            const savedBank = localStorage.getItem('quizBank');
+            
+            if (savedBank) {
+                try {
+                    questionsBank = JSON.parse(savedBank);
+                    if (questionsBank.length > 0) {
+                        questions = questionsBank.slice();
+                        examMode = false;
+                        examAnswers = [];
+                        skipAutoResume = false;
+                        
+                        document.getElementById('importScreen').style.display = 'none';
+                        document.getElementById('quizMain').style.display = 'flex';
+                        showQuizFab();
+                        
+                        if (savedProgress) {
+                            const progress = JSON.parse(savedProgress);
+                            if (!progress.isExamData && progress.questionsLength === questions.length && progress.bankLength === questionsBank.length) {
+                                currentQuestion = progress.currentQuestion || 0;
+                                correctAnswers = progress.correctAnswers || 0;
+                                wrongAnswers = progress.wrongAnswers || 0;
+                                quizStarted = progress.quizStarted || false;
+                                if (quizStarted) {
+                                    document.getElementById('resumeBanner').style.display = 'block';
+                                    document.getElementById('resumeText').textContent = `تم استعادة الجلسة السابقة (السؤال ${currentQuestion + 1}). متابعة...`;
+                                    setTimeout(() => {
+                                        startQuiz();
+                                        document.getElementById('resumeBanner').style.display = 'none';
+                                    }, 3000);
+                                    return;
+                                }
+                            }
+                        }
+                        currentQuestion = 0;
+                        correctAnswers = 0;
+                        wrongAnswers = 0;
+                        quizStarted = false;
+                        startQuiz();
+                        return;
+                    }
+                } catch (e) {
+                    console.log('خطأ في تحميل البيانات المحفوظة:', e);
+                }
+            }
+            
+            // إذا لم توجد بيانات محفوظة، أظهر شاشة الاستيراد
+            document.getElementById('importScreen').style.display = 'flex';
+            document.getElementById('quizMain').style.display = 'none';
+        }
+
+        // استدعاء التهيئة عند تحميل الصفحة
+        window.addEventListener('load', initializeApp);
 
         // Register service worker for PWA
         if ('serviceWorker' in navigator) {
