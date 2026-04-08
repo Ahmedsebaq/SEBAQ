@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^Add-Type -AssemblyName System\\.Drawing; \\$bmp = New-Object System\\.Drawing\\.Bitmap\\(192,192\\); \\$g = \\[System\\.Drawing\\.Graphics\\]::FromImage\\(\\$bmp\\); \\$g\\.Clear\\(\\[System\\.Drawing\\.Color\\]::FromArgb\\(102,126,234\\)\\); \\$font = New-Object System\\.Drawing\\.Font\\(\"Arial\", 80, \\[System\\.Drawing\\.FontStyle\\]::Bold\\); \\$brush = \\[System\\.Drawing\\.Brushes\\]::White; \\$g\\.DrawString\\(\"🎯\", \\$font, \\$brush, 50, 50\\); \\$bmp\\.Save\\(\"icon-192\\.png\", \\[System\\.Drawing\\.Imaging\\.ImageFormat\\]::Png\\); \\$g\\.Dispose\\(\\); \\$bmp\\.Dispose\\(\\)$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

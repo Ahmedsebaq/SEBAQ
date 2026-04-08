@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر الأسئلة المتقدم</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100dvh;
+            padding: 4px 6px 70px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 4px;
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: clamp(1.1rem, 4vw, 1.65rem);
+            margin-bottom: 2px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: clamp(0.72rem, 2.2vw, 0.85rem);
+            opacity: 0.88;
+            line-height: 1.3;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 5px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 0;
+            padding: 7px 6px;
+            border: none;
+            border-radius: 10px;
+            font-size: clamp(0.78rem, 2.4vw, 0.9rem);
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.22);
+            color: #fff;
+            transition: background 0.2s, transform 0.15s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.32);
+        }
+
+        .tab-btn.active {
+            background: #fff;
+            color: #5a4fcf;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+        }
+
+        .tab-panel {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .tab-panel.active {
+            display: flex;
+        }
+
+        .panel-scroll {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+        }
+
+        /* تبويب الإضافة: بدون تمرير للصفحة — يملأ المساحة المتاحة */
+        #panel-add .panel-scroll {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 0;
+        }
+
+        @media (max-width: 768px) {
+            #panel-add .panel-scroll {
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            min-height: 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 12px 14px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: clamp(0.95rem, 2.8vw, 1.1rem);
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 48px;
+            max-height: 140px;
+        }
+
+        .answer-input {
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(72, 187, 120, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: white;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .btn-danger:hover {
+            transform: scale(1.05);
+        }
+
+        .questions-list {
+            max-height: none;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .question-item {
+            background: #f7fafc;
+            padding: 10px 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .question-item:hover {
+            border-color: #667eea;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .answer-list {
+            padding-right: 20px;
+            margin-bottom: 10px;
+        }
+
+        .answer-list li {
+            margin-bottom: 5px;
+            color: #4a5568;
+        }
+
+        .answer-list li.correct {
+            color: #48bb78;
+            font-weight: bold;
+        }
+
+        .answer-list li.correct::before {
+            content: "✓ ";
+        }
+
+        .question-heading {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .question-subheading {
+            color: #4a5568;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+        }
+
+        .tf-correct {
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 8px;
+            background: #c6f6d5;
+            color: #22543d;
+            font-weight: bold;
+            border: 1px solid #48bb78;
+        }
+
+        .code-output {
+            background: #1a202c;
+            color: #48bb78;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(0.65rem, 2vw, 0.78rem);
+            flex: 1;
+            min-height: 100px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .json-panel-inner {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            gap: 8px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-bottom: 5px;
+            flex-shrink: 0;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 4px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: clamp(0.65rem, 2vw, 0.75rem);
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-size: clamp(1rem, 4vw, 1.35rem);
+            font-weight: bold;
+        }
+
+        .stat-tight {
+            font-size: clamp(0.7rem, 2.6vw, 0.88rem) !important;
+            line-height: 1.25;
+            word-break: break-word;
+        }
+
+        .card-stretch {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .card-stretch > h2 {
+            flex-shrink: 0;
+        }
+
+        .range-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            justify-content: flex-end;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .range-input {
+            width: 68px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+        }
+
+        .alert {
+            padding: 8px 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 2px solid #48bb78;
+        }
+
+        .alert-info {
+            background: #bee3f8;
+            color: #2c5282;
+            border: 2px solid #4299e1;
+        }
+
+        /* زر عائم + قائمة */
+        .fab-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.25);
+            z-index: 998;
+            display: none;
+        }
+
+        .fab-backdrop.show {
+            display: block;
+        }
+
+        .fab-wrap {
+            position: fixed;
+            z-index: 999;
+            /* يمين الشاشة في واجهة RTL */
+            inset-inline-start: 14px;
+            bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .fab-menu {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 200px;
+            max-width: min(92vw, 280px);
+        }
+
+        .fab-menu.show {
+            display: flex;
+        }
+
+        .fab-menu button {
+            width: 100%;
+            padding: 12px 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: right;
+            font-family: inherit;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.15s;
+        }
+
+        .fab-menu button:hover {
+            transform: translateY(-1px);
+        }
+
+        .fab-menu .fab-opt-import {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: #fff;
+        }
+
+        .fab-menu .fab-opt-new {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: #fff;
+        }
+
+        .fab-btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: none;
+            font-size: 2rem;
+            line-height: 1;
+            cursor: pointer;
+            background: linear-gradient(145deg, #fff 0%, #e8e8f0 100%);
+            color: #4c51bf;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .fab-btn:hover {
+            transform: scale(1.06);
+            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .fab-btn:active {
+            transform: scale(0.98);
+        }
+
+        @media (max-width: 968px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* تبويب الإضافة: عمود (سؤال + إجابات) | عمود (عناوين + نوع + إدراج + أزرار) */
+        .add-split {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .add-col {
+            min-width: 0;
+        }
+
+        .add-col-write {
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .add-col-options {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 8px 10px;
+            border: 1px solid #e2e8f0;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .card-add {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 8px 10px;
+        }
+
+        .card-add > h2 {
+            flex-shrink: 0;
+            margin-bottom: 6px;
+            font-size: clamp(0.88rem, 2.4vw, 1rem);
+        }
+
+        .card-add .form-group {
+            margin-bottom: 6px;
+        }
+
+        .card-add .form-group label {
+            margin-bottom: 3px;
+            font-size: 0.78rem;
+        }
+
+        .card-add .form-group input,
+        .card-add .form-group select {
+            padding: 6px 8px;
+            font-size: 0.88rem;
+            border-radius: 8px;
+        }
+
+        .card-add .button-group {
+            margin-top: 4px;
+            margin-bottom: 0;
+            gap: 5px;
+        }
+
+        .card-add .btn {
+            padding: 6px 10px;
+            font-size: 0.78rem;
+        }
+
+        /* مربع السؤال يأخذ المساحة الفارغة؛ التمرير فقط داخله إن لزم */
+        .add-question-block {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 6px;
+        }
+
+        .add-question-block textarea#questionText {
+            flex: 1;
+            min-height: 64px;
+            max-height: none !important;
+            resize: none;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            box-sizing: border-box;
+        }
+
+        #panel-add #mcFields,
+        #panel-add #tfFields {
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        #panel-add #mcFields .form-group {
+            margin-bottom: 4px;
+        }
+
+        #panel-add #mcFields .form-group label {
+            font-size: 0.72rem;
+        }
+
+        #panel-add #mcFields input,
+        #panel-add #mcFields select {
+            padding: 5px 8px;
+            font-size: 0.82rem;
+        }
+
+        @media (min-width: 769px) {
+            .add-split {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            .add-col-write {
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                padding: 8px 10px;
+                background: #fff;
+            }
+
+            .add-col-options {
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+                overflow: hidden;
+            }
+
+            .add-col-options .button-group {
+                margin-top: auto;
+            }
+
+            #panel-add #mcFields {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 4px 10px;
+            }
+
+            #panel-add #mcFields > .form-group {
+                margin-bottom: 0;
+            }
+
+            #panel-add #mcFields > .form-group:last-child {
+                grid-column: 1 / -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 محرر الأسئلة المتقدم</h1>
+            <p>أضف وعدل أسئلتك بسهولة واحصل على الكود الجاهز</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-label">عدد الأسئلة</div>
+                <div class="stat-value" id="totalQuestions">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">آخر حفظ</div>
+                <div class="stat-value stat-tight" id="lastSave">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">الحالة</div>
+                <div class="stat-value stat-tight" id="status">✓ جاهز</div>
+            </div>
+        </div>
+
+        <div class="tab-bar" role="tablist">
+            <button type="button" class="tab-btn active" data-tab="add" role="tab" aria-selected="true">➕ إضافة</button>
+            <button type="button" class="tab-btn" data-tab="list" role="tab" aria-selected="false">📋 الأسئلة</button>
+            <button type="button" class="tab-btn" data-tab="json" role="tab" aria-selected="false">💻 JSON</button>
+        </div>
+
+        <div id="panel-add" class="tab-panel active" role="tabpanel">
+            <div class="panel-scroll">
+            <div class="card card-add">
+                <h2>➕ إضافة سؤال جديد</h2>
+                <div class="add-split">
+                <div class="add-col add-col-write">
+                <div class="form-group add-question-block">
+                    <label>كتابة السؤال:</label>
+                    <textarea id="questionText" placeholder="اكتب السؤال هنا..." rows="3"></textarea>
+                </div>
+
+                <!-- حقول الاختياري مغلفة لتسهيل الإخفاء عند اختيار صح/خطأ -->
+                <div id="mcFields">
+                    <div class="form-group">
+                        <label>الإجابة 1:</label>
+                        <input type="text" id="answer1" class="answer-input" placeholder="الإجابة الأولى">
+                    </div>
+
+                    <div class="form-group">
+                        <label>الإجابة 2:</label>
+                        <input type="text" id="answer2" class="answer-input" placeholder="الإجابة الثانية">
+                    </div>
+
+                    <div class="form-group">
+                        <label>الإجابة 3:</label>
+                        <input type="text" id="answer3" class="answer-input" placeholder="الإجابة الثالثة">
+                    </div>
+
+                    <div class="form-group">
+                        <label>الإجابة 4:</label>
+                        <input type="text" id="answer4" class="answer-input" placeholder="الإجابة الرابعة">
+                    </div>
+
+                    <div class="form-group">
+                        <label>الإجابة الصحيحة:</label>
+                        <select id="correctAnswer">
+                            <option value="0">الإجابة 1</option>
+                            <option value="1">الإجابة 2</option>
+                            <option value="2">الإجابة 3</option>
+                            <option value="3">الإجابة 4</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- حقول صح/خطأ -->
+                <div id="tfFields" style="display: none;">
+                    <div class="form-group">
+                        <label>اختر الإجابة الصحيحة:</label>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <label><input type="radio" name="tfCorrect" value="true"> صح</label>
+                            <label><input type="radio" name="tfCorrect" value="false"> خطأ</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>إذا كانت العبارة خاطئة — اكتب الصياغة الصحيحة (اختياري):</label>
+                        <input type="text" id="tfCorrection" placeholder="اكتب الصياغة الصحيحة هنا">
+                    </div>
+                </div>
+                </div>
+
+                <div class="add-col add-col-options">
+                <div class="form-group">
+                    <label>العنوان الرئيسي (اختياري):</label>
+                    <input type="text" id="mainHeading" placeholder="مثال: الفصل الأول">
+                </div>
+
+                <div class="form-group">
+                    <label>العنوان الفرعي (اختياري):</label>
+                    <input type="text" id="subHeading" placeholder="مثال: أنواع البوليمرات">
+                </div>
+
+                <div class="form-group">
+                    <label>نوع السؤال:</label>
+                    <select id="questionType">
+                        <option value="mc">اختياري (4 اختيارات)</option>
+                        <option value="tf">صح / خطأ</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>إدراج في الموضع:</label>
+                    <select id="insertPosition">
+                        <option value="end">في النهاية</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" id="addBtn" onclick="addQuestion()">➕ إضافة السؤال</button>
+                    <button class="btn btn-danger" onclick="clearForm()">🗑️ مسح</button>
+                    <button class="btn" style="background:#f6ad55;color:white;" onclick="clearHeadings()">🗑️ حذف العناوين</button>
+                </div>
+                </div>
+
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <div id="panel-list" class="tab-panel" role="tabpanel">
+            <div class="panel-scroll">
+            <div class="card card-stretch">
+                <h2>📋 الأسئلة المحفوظة</h2>
+                <div class="questions-list" id="questionsList">
+                    <div class="alert alert-info">
+                        لا توجد أسئلة بعد. ابدأ بإضافة سؤال!
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <div id="panel-json" class="tab-panel" role="tabpanel">
+            <div class="panel-scroll">
+            <div class="card json-panel-inner card-stretch">
+            <h2>💻 JSON الأسئلة</h2>
+            <div class="alert alert-success" id="copyAlert" style="display: none;">
+                ✓ تم النسخ بنجاح! الصق الكود في ملفك
+            </div>
+            <div class="code-output" id="codeOutput">// لا توجد أسئلة بعد...</div>
+            <div style="margin-top:4px; text-align: right; font-weight: bold; font-size: 0.85rem;" id="newCount">الأسئلة الجديدة: 0</div>
+            <div class="range-row">
+                <label>نسخ مجال:</label>
+                <input type="number" id="rangeFrom" min="1" placeholder="من" class="range-input">
+                <input type="number" id="rangeTo" min="1" placeholder="إلى" class="range-input">
+                <button type="button" class="btn" style="background:#5a67d8;color:white;" onclick="copyRange()">📋 نسخ</button>
+                <button type="button" class="btn" style="background:#3182ce;color:white;" onclick="downloadRange()">💾 مجال</button>
+            </div>
+            <div class="button-group">
+                <button type="button" class="btn btn-success" onclick="copyCode()">📋 نسخ JSON</button>
+                <button type="button" class="btn btn-primary" onclick="downloadCode()">💾 تحميل</button>
+                <button type="button" class="btn btn-danger" onclick="clearAllQuestions()">🗑️ الكل</button>
+            </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fabBackdrop" class="fab-backdrop" onclick="closeFabMenu()" aria-hidden="true"></div>
+    <div class="fab-wrap">
+        <div id="fabMenu" class="fab-menu" role="menu" aria-hidden="true">
+            <button type="button" class="fab-opt-import" role="menuitem" onclick="closeFabMenu(); importQuestions();">📥 استيراد من JSON</button>
+            <button type="button" class="fab-opt-new" role="menuitem" onclick="closeFabMenu(); startNewEditorSession();">✨ جلسة أسئلة جديدة</button>
+        </div>
+        <button type="button" class="fab-btn" id="fabToggle" aria-label="فتح قائمة الملف والجلسة" aria-expanded="false" onclick="toggleFabMenu()">📁</button>
+    </div>
+
+    <script>
+        let questions = [];
+
+        // رقم آخر نسخ محفوظ (index) — نستخدمه لحساب الأسئلة الجديدة
+        let lastCopiedIndex = 0;
+
+        // تحميل الأسئلة من LocalStorage عند فتح الصفحة
+        window.onload = function() {
+            const saved = localStorage.getItem('quizQuestions');
+            if (saved) {
+                questions = JSON.parse(saved);
+
+                // تحويل الأسئلة القديمة: إذا لم تحتوي على 'type' اعتبرها اختياري (mc)
+                questions = questions.map(q => {
+                    if (!q.type) q.type = 'mc';
+                    if (!('mainHeading' in q)) q.mainHeading = null;
+                    if (!('subHeading' in q)) q.subHeading = null;
+                    return q;
+                });
+
+                // تحميل آخر نقطة نسخ محفوظة إذا وجدت
+                const savedLast = parseInt(localStorage.getItem('quizLastCopiedIndex'));
+                if (!Number.isNaN(savedLast) && savedLast >= 0) lastCopiedIndex = savedLast;
+
+                updateDisplay();
+                updateLastSave();
+                updateNewCount();
+            }
+
+            // تهيئة الحقول حسب نوع السؤال الافتراضي
+            document.getElementById('questionType').addEventListener('change', toggleFormFields);
+            toggleFormFields();
+            updateInsertPositions();
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => setEditorTab(btn.dataset.tab));
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeFabMenu();
+            });
+        };
+
+        function setEditorTab(name) {
+            document.querySelectorAll('.tab-panel').forEach(p => {
+                p.classList.toggle('active', p.id === 'panel-' + name);
+            });
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                const on = b.dataset.tab === name;
+                b.classList.toggle('active', on);
+                b.setAttribute('aria-selected', on ? 'true' : 'false');
+            });
+        }
+
+        function toggleFabMenu() {
+            const menu = document.getElementById('fabMenu');
+            const back = document.getElementById('fabBackdrop');
+            const fab = document.getElementById('fabToggle');
+            const open = !menu.classList.contains('show');
+            menu.classList.toggle('show', open);
+            back.classList.toggle('show', open);
+            fab.setAttribute('aria-expanded', open ? 'true' : 'false');
+            menu.setAttribute('aria-hidden', open ? 'false' : 'true');
+        }
+
+        function closeFabMenu() {
+            const menu = document.getElementById('fabMenu');
+            const back = document.getElementById('fabBackdrop');
+            const fab = document.getElementById('fabToggle');
+            menu.classList.remove('show');
+            back.classList.remove('show');
+            fab.setAttribute('aria-expanded', 'false');
+            menu.setAttribute('aria-hidden', 'true');
+        }
+
+        function startNewEditorSession() {
+            if (!confirm('✨ بدء جلسة أسئلة جديدة؟ سيتم مسح كل الأسئلة من المحرر (لا رجوع بعد الحفظ).')) return;
+            questions = [];
+            lastCopiedIndex = 0;
+            localStorage.setItem('quizLastCopiedIndex', '0');
+            saveQuestions();
+            updateDisplay();
+            updateNewCount();
+            setEditorTab('add');
+        }
+
+        // محرر: مؤشر تعديل (لم يعد مستخدماً في الوضع الجديد inline)
+        let editingIndex = null;
+
+        // إضافة سؤال جديد أو حفظ تعديل
+        function addQuestion() {
+            const qType = document.getElementById('questionType').value; // 'mc' or 'tf'
+            const questionText = document.getElementById('questionText').value.trim();
+            const mainHeading = document.getElementById('mainHeading').value.trim();
+            const subHeading = document.getElementById('subHeading').value.trim();
+            const insertPos = document.getElementById('insertPosition').value;
+
+            if (!questionText) {
+                alert('⚠️ يرجى كتابة نص السؤال!');
+                return;
+            }
+
+            let newQuestion;
+
+            if (qType === 'mc') {
+                const answer1 = document.getElementById('answer1').value.trim();
+                const answer2 = document.getElementById('answer2').value.trim();
+                const answer3 = document.getElementById('answer3').value.trim();
+                const answer4 = document.getElementById('answer4').value.trim();
+                const correctAnswer = parseInt(document.getElementById('correctAnswer').value);
+
+                // التحقق من الحقول
+                if (!answer1 || !answer2 || !answer3 || !answer4) {
+                    alert('⚠️ يرجى ملء جميع حقول الإجابات!');
+                    return;
+                }
+
+                newQuestion = {
+                    id: `q${questions.length + 1}`, // سيتم إعادة الترقيم لاحقاً
+                    type: 'mc',
+                    question: questionText,
+                    answers: [answer1, answer2, answer3, answer4],
+                    correctAnswer: correctAnswer,
+                    mainHeading: mainHeading || null,
+                    subHeading: subHeading || null
+                };
+            } else if (qType === 'tf') {
+                const tfChecked = document.querySelector('input[name="tfCorrect"]:checked');
+                if (!tfChecked) {
+                    alert('⚠️ اختر الإجابة الصحيحة: صح أو خطأ');
+                    return;
+                }
+                const correctTF = tfChecked.value === 'true';
+                const correctionText = document.getElementById('tfCorrection').value.trim();
+
+                newQuestion = {
+                    id: `q${questions.length + 1}`, // سيتم إعادة الترقيم لاحقاً
+                    type: 'tf',
+                    question: questionText,
+                    correctTF: correctTF,
+                    correction: correctionText || null,
+                    mainHeading: mainHeading || null,
+                    subHeading: subHeading || null
+                };
+            }
+
+            // إدراج السؤال في الموضع المحدد
+            if (insertPos === 'end') {
+                questions.push(newQuestion);
+            } else {
+                const pos = parseInt(insertPos);
+                questions.splice(pos + 1, 0, newQuestion); // +1 لأن الموضع هو بعد السؤال
+            }
+
+            // إعادة ترقيم الأسئلة
+            questions.forEach((q, i) => {
+                q.id = `q${i + 1}`;
+            });
+
+            saveQuestions();
+            clearForm();
+            updateDisplay();
+        }
+
+        // تبديل إظهار الحقول بحسب نوع السؤال
+        function toggleFormFields() {
+            const qType = document.getElementById('questionType').value;
+            const mcFields = document.getElementById('mcFields');
+            const tfFields = document.getElementById('tfFields');
+
+            if (qType === 'mc') {
+                mcFields.style.display = 'block';
+                tfFields.style.display = 'none';
+            } else {
+                mcFields.style.display = 'none';
+                tfFields.style.display = 'block';
+            }
+        }
+
+        // مسح النموذج
+        function clearForm() {
+            document.getElementById('questionText').value = '';
+
+            // عناوين
+            document.getElementById('mainHeading').value = '';
+            document.getElementById('subHeading').value = '';
+
+            // اختياري
+            document.getElementById('answer1').value = '';
+            document.getElementById('answer2').value = '';
+            document.getElementById('answer3').value = '';
+            document.getElementById('answer4').value = '';
+            document.getElementById('correctAnswer').value = '0';
+
+            // صح/خطأ
+            const tfRadios = document.querySelectorAll('input[name="tfCorrect"]');
+            tfRadios.forEach(r => r.checked = false);
+            document.getElementById('tfCorrection').value = '';
+
+            // إعادة تعيين الموضع
+            document.getElementById('insertPosition').value = 'end';
+
+            // إلغاء وضع التعديل إذا كان فعالًا
+            editingIndex = null;
+            document.getElementById('addBtn').textContent = '➕ إضافة السؤال';
+
+            // لا نعيد تعيين نوع السؤال هنا حتى تظل قيمة الاختيار التي اخترتها (لتسهيل إضافة أسئلة متشابهة النوع)
+        }
+
+        // حذف سؤال
+        function deleteQuestion(index) {
+            if (confirm('هل أنت متأكد من حذف هذا السؤال؟')) {
+                questions.splice(index, 1);
+                // إعادة ترقيم الأسئلة
+                questions.forEach((q, i) => {
+                    q.id = `q${i + 1}`;
+                });
+                saveQuestions();
+                updateDisplay();
+            }
+        }
+
+        // تحميل السؤال في النموذج للتعديل (لم يعد مستخدماً - التعديل الآن inline)
+        function editQuestion(index) {
+            // هذه الدالة محتفظ بها للتوافقية فقط
+            console.log('استخدام التعديل inline بدلاً من هذه الدالة');
+        }
+
+        // مسح العناوين لحالة سؤال محدد
+        function clearHeadingsOf(index) {
+            if (confirm('هل تريد حذف العناوين الخاصة بهذا السؤال؟')) {
+                questions[index].mainHeading = null;
+                questions[index].subHeading = null;
+                saveQuestions();
+                updateDisplay();
+            }
+        }
+
+        // مسح حقول العناوين في النموذج
+        function clearHeadings() {
+            document.getElementById('mainHeading').value = '';
+            document.getElementById('subHeading').value = '';
+        }
+
+        // حفظ الأسئلة
+        function saveQuestions() {
+            localStorage.setItem('quizQuestions', JSON.stringify(questions));
+            updateLastSave();
+            
+            // تحديث الحالة
+            document.getElementById('status').textContent = '✓ محفوظ';
+            setTimeout(() => {
+                document.getElementById('status').textContent = '✓ جاهز';
+            }, 2000);
+        }
+
+        // تحديث العرض
+        function updateDisplay() {
+            updateQuestionsList();
+            updateCodeOutput();
+            document.getElementById('totalQuestions').textContent = questions.length;
+            updateNewCount();
+            updateInsertPositions();
+        }
+
+        // تحديث عداد الأسئلة الجديدة
+        function updateNewCount() {
+            const start = lastCopiedIndex || 0;
+            const count = Math.max(0, questions.length - start);
+            const el = document.getElementById('newCount');
+            if (el) el.textContent = 'الأسئلة الجديدة: ' + count;
+        }
+
+        // تحديث قائمة مواضع الإدراج
+        function updateInsertPositions() {
+            const select = document.getElementById('insertPosition');
+            select.innerHTML = '<option value="end">في النهاية</option>';
+            
+            for (let i = 1; i <= questions.length; i++) {
+                const option = document.createElement('option');
+                option.value = i - 1; // الموضع في المصفوفة (0-based)
+                option.textContent = `بعد السؤال ${i}`;
+                select.appendChild(option);
+            }
+        }
+
+        // تحديث قائمة الأسئلة
+        function updateQuestionsList() {
+            const list = document.getElementById('questionsList');
+            
+            if (questions.length === 0) {
+                list.innerHTML = '<div class="alert alert-info">لا توجد أسئلة بعد. ابدأ بإضافة سؤال!</div>';
+                return;
+            }
+
+            list.innerHTML = '';
+            questions.forEach((q, index) => {
+                const item = document.createElement('div');
+                item.className = 'question-item';
+                item.id = `question-${index}`;
+
+                const type = q.type || 'mc';
+                let editMode = false;
+
+                // دالة للتبديل بين وضع العرض والتحرير
+                const toggleEditMode = () => {
+                    editMode = !editMode;
+                    renderQuestion(index, editMode);
+                };
+
+                item.innerHTML = generateQuestionHTML(q, index, type, toggleEditMode);
+                list.appendChild(item);
+            });
+        }
+
+        function generateQuestionHTML(q, index, type, toggleEditMode) {
+            const qElement = document.getElementById(`question-${index}`);
+            const isEditing = qElement && qElement.dataset.editing === 'true';
+
+            if (isEditing) {
+                // وضع التحرير
+                let html = `
+                    <div class="question-header">
+                        <span class="question-number">سؤال ${index + 1}</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-success" style="padding: 8px 12px; font-size: 14px;" onclick="saveInlineEdit(${index})">✓ حفظ</button>
+                            <button class="btn" style="background: #a0aec0; color: white; padding: 8px 12px; font-size: 14px;" onclick="cancelInlineEdit(${index})">✕ إلغاء</button>
+                            <button class="btn btn-danger" onclick="deleteQuestion(${index})">🗑️ حذف</button>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label style="font-weight: bold; color: #2d3748;">نص السؤال:</label>
+                        <textarea id="edit-q-${index}" style="width: 100%; padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px; min-height: 60px;">${q.question}</textarea>
+                    </div>`;
+
+                if (type === 'mc') {
+                    html += `
+                    <div style="margin-top: 15px;">
+                        <label style="font-weight: bold; color: #2d3748;">الإجابات:</label>
+                        ${q.answers.map((ans, i) => `
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <input type="radio" name="edit-correct-${index}" value="${i}" ${i === q.correctAnswer ? 'checked' : ''}>
+                                <input type="text" id="edit-ans-${index}-${i}" value="${ans}" style="flex: 1; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                            </div>
+                        `).join('')}
+                    </div>`;
+                } else if (type === 'tf') {
+                    html += `
+                    <div style="margin-top: 15px;">
+                        <label style="font-weight: bold; color: #2d3748;">الإجابة:</label>
+                        <div style="display: flex; gap: 20px; margin-bottom: 10px;">
+                            <label><input type="radio" name="edit-tf-${index}" value="true" ${q.correctTF ? 'checked' : ''}> صح</label>
+                            <label><input type="radio" name="edit-tf-${index}" value="false" ${!q.correctTF ? 'checked' : ''}> خطأ</label>
+                        </div>
+                        <input type="text" id="edit-correction-${index}" placeholder="الصياغة الصحيحة (اختياري)" value="${q.correction || ''}" style="width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                    </div>`;
+                }
+
+                return html;
+            } else {
+                // وضع العرض
+                let html = `
+                    <div class="question-header">
+                        <span class="question-number">سؤال ${index + 1}</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn" style="background: #ed8936; color: white; padding: 8px 12px; font-size: 14px;" onclick="startInlineEdit(${index})">✏️ تعديل</button>
+                            <button class="btn btn-danger" onclick="deleteQuestion(${index})">🗑️ حذف</button>
+                        </div>
+                    </div>
+                    <div class="question-text">${q.question}</div>`;
+
+                if (type === 'mc') {
+                    html += `
+                    <ul class="answer-list">
+                        ${q.answers.map((ans, i) => `
+                            <li class="${i === q.correctAnswer ? 'correct' : ''}">${ans}</li>
+                        `).join('')}
+                    </ul>`;
+                } else if (type === 'tf') {
+                    html += `
+                    <ul class="answer-list">
+                        <li class="${q.correctTF ? 'correct' : ''}">صح</li>
+                        <li class="${!q.correctTF ? 'correct' : ''}">خطأ</li>
+                    </ul>`;
+
+                    if (!q.correctTF && q.correction) {
+                        html += `
+                        <div class="tf-correct">**الصواب:** ${q.correction}</div>`;
+                    }
+                }
+
+                return html;
+            }
+        }
+
+        // بدء التحرير inline
+        function startInlineEdit(index) {
+            const item = document.getElementById(`question-${index}`);
+            item.dataset.editing = 'true';
+            renderQuestion(index, true);
+        }
+
+        // إلغاء التحرير inline
+        function cancelInlineEdit(index) {
+            const item = document.getElementById(`question-${index}`);
+            item.dataset.editing = 'false';
+            renderQuestion(index, false);
+        }
+
+        // حفظ التعديل inline
+        function saveInlineEdit(index) {
+            const q = questions[index];
+            const type = q.type || 'mc';
+            const newQuestion = document.getElementById(`edit-q-${index}`).value.trim();
+
+            if (!newQuestion) {
+                alert('⚠️ نص السؤال لا يمكن أن يكون فارغاً!');
+                return;
+            }
+
+            q.question = newQuestion;
+
+            if (type === 'mc') {
+                const answers = [];
+                let allFilled = true;
+                for (let i = 0; i < 4; i++) {
+                    const ans = document.getElementById(`edit-ans-${index}-${i}`).value.trim();
+                    if (!ans) allFilled = false;
+                    answers.push(ans);
+                }
+                if (!allFilled) {
+                    alert('⚠️ جميع الإجابات يجب أن تكون مملوءة!');
+                    return;
+                }
+                q.answers = answers;
+                const correctRadio = document.querySelector(`input[name="edit-correct-${index}"]:checked`);
+                q.correctAnswer = parseInt(correctRadio.value);
+            } else if (type === 'tf') {
+                const tfRadio = document.querySelector(`input[name="edit-tf-${index}"]:checked`);
+                q.correctTF = tfRadio.value === 'true';
+                q.correction = document.getElementById(`edit-correction-${index}`).value.trim() || null;
+            }
+
+            saveQuestions();
+            const item = document.getElementById(`question-${index}`);
+            item.dataset.editing = 'false';
+            renderQuestion(index, false);
+            
+            // تحديث الكود والعرض الكامل
+            updateDisplay();
+        }
+
+        // إعادة رسم السؤال
+        function renderQuestion(index, isEditing) {
+            const q = questions[index];
+            const type = q.type || 'mc';
+            const item = document.getElementById(`question-${index}`);
+            
+            if (isEditing) {
+                let html = `
+                    <div class="question-header">
+                        <span class="question-number">سؤال ${index + 1}</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-success" style="padding: 8px 12px; font-size: 14px;" onclick="saveInlineEdit(${index})">✓ حفظ</button>
+                            <button class="btn" style="background: #a0aec0; color: white; padding: 8px 12px; font-size: 14px;" onclick="cancelInlineEdit(${index})">✕ إلغاء</button>
+                            <button class="btn btn-danger" onclick="deleteQuestion(${index})">🗑️ حذف</button>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label style="font-weight: bold; color: #2d3748;">نص السؤال:</label>
+                        <textarea id="edit-q-${index}" style="width: 100%; padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px; min-height: 60px;">${q.question}</textarea>
+                    </div>`;
+
+                if (type === 'mc') {
+                    html += `
+                    <div style="margin-top: 15px;">
+                        <label style="font-weight: bold; color: #2d3748;">الإجابات:</label>
+                        ${q.answers.map((ans, i) => `
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <input type="radio" name="edit-correct-${index}" value="${i}" ${i === q.correctAnswer ? 'checked' : ''}>
+                                <input type="text" id="edit-ans-${index}-${i}" value="${ans}" style="flex: 1; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                            </div>
+                        `).join('')}
+                    </div>`;
+                } else if (type === 'tf') {
+                    html += `
+                    <div style="margin-top: 15px;">
+                        <label style="font-weight: bold; color: #2d3748;">الإجابة:</label>
+                        <div style="display: flex; gap: 20px; margin-bottom: 10px;">
+                            <label><input type="radio" name="edit-tf-${index}" value="true" ${q.correctTF ? 'checked' : ''}> صح</label>
+                            <label><input type="radio" name="edit-tf-${index}" value="false" ${!q.correctTF ? 'checked' : ''}> خطأ</label>
+                        </div>
+                        <input type="text" id="edit-correction-${index}" placeholder="الصياغة الصحيحة (اختياري)" value="${q.correction || ''}" style="width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                    </div>`;
+                }
+                item.innerHTML = html;
+            } else {
+                let html = `
+                    <div class="question-header">
+                        <span class="question-number">سؤال ${index + 1}</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn" style="background: #ed8936; color: white; padding: 8px 12px; font-size: 14px;" onclick="startInlineEdit(${index})">✏️ تعديل</button>
+                            <button class="btn btn-danger" onclick="deleteQuestion(${index})">🗑️ حذف</button>
+                        </div>
+                    </div>
+                    <div class="question-text">${q.question}</div>`;
+
+                if (type === 'mc') {
+                    html += `
+                    <ul class="answer-list">
+                        ${q.answers.map((ans, i) => `
+                            <li class="${i === q.correctAnswer ? 'correct' : ''}">${ans}</li>
+                        `).join('')}
+                    </ul>`;
+                } else if (type === 'tf') {
+                    html += `
+                    <ul class="answer-list">
+                        <li class="${q.correctTF ? 'correct' : ''}">صح</li>
+                        <li class="${!q.correctTF ? 'correct' : ''}">خطأ</li>
+                    </ul>`;
+
+                    if (!q.correctTF && q.correction) {
+                        html += `
+                        <div class="tf-correct">**الصواب:** ${q.correction}</div>`;
+                    }
+                }
+                item.innerHTML = html;
+            }
+        }
+
+        // تحديث كود الإخراج (نستخدم JSON.stringify لسهولة الاستيراد لاحقًا)
+        function updateCodeOutput() {
+            const output = document.getElementById('codeOutput');
+            
+            if (questions.length === 0) {
+                output.textContent = '// لا توجد أسئلة بعد...';
+                return;
+            }
+
+            const jsonData = JSON.stringify(questions, null, 4);
+            output.textContent = jsonData;
+        }
+
+        // نسخ الكود
+        function copyCode() {
+            const jsonData = document.getElementById('codeOutput').textContent;
+            
+            if (jsonData.includes('لا توجد أسئلة')) {
+                alert('⚠️ لا توجد أسئلة للنسخ!');
+                return;
+            }
+
+            navigator.clipboard.writeText(jsonData).then(() => {
+                const alertEl = document.getElementById('copyAlert');
+                alertEl.textContent = '✓ تم نسخ كل الأسئلة!';
+                alertEl.style.display = 'block';
+                setTimeout(() => {
+                    alertEl.style.display = 'none';
+                }, 3000);
+
+                // تحديث نقطة النسخ لتشمل الآن كله
+                lastCopiedIndex = questions.length;
+                localStorage.setItem('quizLastCopiedIndex', lastCopiedIndex);
+                updateNewCount();
+            });
+        }
+
+        // تحميل ملف
+        function downloadCode() {
+            if (questions.length === 0) {
+                alert('⚠️ لا توجد أسئلة للتحميل!');
+                return;
+            }
+
+            const jsonData = JSON.stringify(questions, null, 4);
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'questions.json';
+            a.click();
+            URL.revokeObjectURL(url);
+
+            // تحديث نقطة النسخ لتشمل الآن كله
+            lastCopiedIndex = questions.length;
+            localStorage.setItem('quizLastCopiedIndex', lastCopiedIndex);
+            updateNewCount();
+        }
+
+        // ======= نسخ/تحميل مجال حسب أرقام الأسئلة (من..إلى) =======
+        function copyRange() {
+            const rawFrom = document.getElementById('rangeFrom').value;
+            const rawTo = document.getElementById('rangeTo').value;
+            const from = parseInt(rawFrom, 10);
+            const to = parseInt(rawTo, 10);
+            if (rawFrom === '' || rawTo === '') { alert('⚠️ ادخل رقم البداية والنهاية أولاً.'); return; }
+            if (Number.isNaN(from) || Number.isNaN(to)) { alert('⚠️ ادخل قيم صالحة في الحقول (أرقام).'); return; }
+            if (from < 1 || to < 1 || from > to) { alert('⚠️ تأكد من أن (من) أصغر أو يساوي (إلى) وكلاهما ≥ 1.'); return; }
+            if (from > questions.length) { alert('⚠️ رقم البداية أكبر من عدد الأسئلة الحالية.'); return; }
+            const end = Math.min(to, questions.length);
+            const slice = questions.slice(from - 1, end);
+            if (slice.length === 0) { alert('⚠️ لا توجد أسئلة ضمن هذا النطاق.'); return; }
+
+            const jsonData = JSON.stringify(slice, null, 4);
+
+            navigator.clipboard.writeText(jsonData).then(() => {
+                const alertEl = document.getElementById('copyAlert');
+                alertEl.textContent = `✓ تم نسخ الأسئلة من ${from} إلى ${end}!`;
+                alertEl.style.display = 'block';
+                setTimeout(() => { alertEl.style.display = 'none'; }, 3000);
+            });
+        }
+
+        function downloadRange() {
+            const rawFrom = document.getElementById('rangeFrom').value;
+            const rawTo = document.getElementById('rangeTo').value;
+            const from = parseInt(rawFrom, 10);
+            const to = parseInt(rawTo, 10);
+            if (rawFrom === '' || rawTo === '') { alert('⚠️ ادخل رقم البداية والنهاية أولاً.'); return; }
+            if (Number.isNaN(from) || Number.isNaN(to)) { alert('⚠️ ادخل قيم صالحة في الحقول (أرقام).'); return; }
+            if (from < 1 || to < 1 || from > to) { alert('⚠️ تأكد من أن (من) أصغر أو يساوي (إلى) وكلاهما ≥ 1.'); return; }
+            if (from > questions.length) { alert('⚠️ رقم البداية أكبر من عدد الأسئلة الحالية.'); return; }
+            const end = Math.min(to, questions.length);
+            const slice = questions.slice(from - 1, end);
+            if (slice.length === 0) { alert('⚠️ لا توجد أسئلة ضمن هذا النطاق.'); return; }
+
+            const jsonData = JSON.stringify(slice, null, 4);
+
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `questions_${from}_to_${end}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // حذف كل الأسئلة
+        function clearAllQuestions() {
+            if (confirm('⚠️ هل أنت متأكد من حذف جميع الأسئلة؟ لن تستطيع التراجع!')) {
+                questions = [];
+                // إعادة تعيين نقطة النسخ
+                lastCopiedIndex = 0;
+                localStorage.setItem('quizLastCopiedIndex', lastCopiedIndex);
+                saveQuestions();
+                updateDisplay();
+                updateNewCount();
+            }
+        }
+
+        // تحديث آخر حفظ
+        function updateLastSave() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('lastSave').textContent = time;
+        }
+
+        // استيراد أسئلة من JSON
+        function importQuestions() {
+            closeFabMenu();
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const imported = JSON.parse(e.target.result);
+                            if (Array.isArray(imported)) {
+                                questions = imported;
+                                saveQuestions();
+                                updateDisplay();
+                                updateNewCount();
+                                setEditorTab('list');
+                                alert('✅ تم استيراد الأسئلة بنجاح!');
+                            } else {
+                                alert('❌ الملف لا يحتوي على مصفوفة أسئلة صحيحة.');
+                            }
+                        } catch (error) {
+                            alert('❌ خطأ في قراءة الملف: ' + error.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+    </script>
+</body>
+</html>
