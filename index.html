@@ -1132,6 +1132,7 @@
         let examMode = false;
         let examAnswers = []; // سجل إجابات الامتحان لكل سؤال في الجلسة
         let skipAutoResume = false; // لتجنب الاستئناف التلقائي بعد استيراد ملف جديد
+        let cloudFilesCache = null; // cache file list to avoid repeated network calls
 
         // ============ حفظ التقدم (لا يُحفظ أثناء وضع الامتحان) ============
         function saveProgress() {
@@ -1535,8 +1536,6 @@
                 feedback.className = 'feedback correct show';
             }
 
-            const revealBtn = document.getElementById('revealBtn');
-            if (revealBtn) revealBtn.disabled = true;
         }
 
         // ============ فحص الإجابة ============
@@ -1862,50 +1861,119 @@
             }
         }
 
+        async function fetchQuestionsFromManifest() {
+            const response = await fetch('./questions/files.json', { cache: 'no-store' });
+            if (!response.ok) throw new Error('manifest not available');
+            const list = await response.json();
+            if (!Array.isArray(list)) throw new Error('manifest is not an array');
+            const names = list
+                .map(item => {
+                    if (!item) return '';
+                    const fileName = typeof item === 'string' ? item : item.file || item.value || item.name || '';
+                    return fileName.split('/').pop().split('\\').pop();
+                })
+                .filter(name => name && name.toLowerCase().endsWith('.json'));
+            return [...new Set(names)];
+        }
+
+        async function fetchQuestionsFromGitHubApi() {
+            const host = window.location.hostname || '';
+            if (!host.endsWith('.github.io')) {
+                throw new Error('not on github pages host');
+            }
+
+            const owner = host.replace('.github.io', '');
+            const pathParts = window.location.pathname.split('/').filter(Boolean);
+            const repo = pathParts.length ? pathParts[0] : owner + '.github.io';
+            const branchHints = ['main', 'master', 'gh-pages'];
+
+            for (const ref of branchHints) {
+                const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/questions?ref=${encodeURIComponent(ref)}`;
+                try {
+                    const response = await fetch(apiUrl, { cache: 'no-store' });
+                    if (!response.ok) continue;
+                    const data = await response.json();
+                    if (!Array.isArray(data)) continue;
+                    const names = data
+                        .filter(item => item && item.type === 'file' && /\.json$/i.test(item.name))
+                        .map(item => item.name);
+                    if (names.length) return [...new Set(names)];
+                } catch (apiError) {
+                    // try the next branch hint
+                }
+            }
+
+            throw new Error('github api listing failed');
+        }
+
+        async function fetchQuestionsFromDirectoryListing() {
+            const response = await fetch('./questions/', { cache: 'no-store' });
+            if (!response.ok) throw new Error('directory listing unavailable');
+            const html = await response.text();
+
+            // Supports common local-server directory listings (e.g. python http.server, http-server, live-server).
+            const hrefRegex = /href\s*=\s*["']([^"']+\.json(?:\?[^"']*)?)["']/gi;
+            const names = [];
+            let match;
+            while ((match = hrefRegex.exec(html)) !== null) {
+                const rawHref = match[1].split('?')[0];
+                const fileName = rawHref.split('/').pop().split('\\').pop();
+                if (fileName && fileName.toLowerCase().endsWith('.json')) {
+                    names.push(decodeURIComponent(fileName));
+                }
+            }
+
+            if (!names.length) throw new Error('no json files in directory listing');
+            return [...new Set(names)];
+        }
+
+        function normalizeDisplayName(fileName) {
+            return fileName.replace(/\.json$/i, '').replace(/[-_]/g, ' ');
+        }
+
         async function populateCloudSelect() {
             const select = document.getElementById('cloudSelect');
             if (!select) return;
 
             select.innerHTML = '<option value="">اختر ملف...</option>';
-            const manifestUrl = './questions/files.json';
-            const baseUrl = './questions/';
+            let files = cloudFilesCache ? cloudFilesCache.slice() : [];
 
-            const addOption = (fileName, label) => {
-                if (!fileName || !fileName.endsWith('.json')) return;
-                let basename = fileName.split('/').pop().split('\\').pop();
-                try {
-                    basename = decodeURIComponent(basename);
-                } catch (decodeError) {
-                    // keep raw basename if decoding fails
-                }
-                const displayName = label || basename.replace(/\.json$/, '').replace(/[-_]/g, ' ');
-                const option = document.createElement('option');
-                option.value = basename;
-                option.textContent = displayName;
-                option.title = basename;
-                select.appendChild(option);
-            };
+            if (!files.length) {
+                const strategies = [
+                    fetchQuestionsFromManifest,
+                    fetchQuestionsFromGitHubApi,
+                    fetchQuestionsFromDirectoryListing
+                ];
 
-            try {
-                const response = await fetch(manifestUrl);
-                if (!response.ok) throw new Error('لا يمكن قراءة قائمة الملفات');
-                const list = await response.json();
-                if (Array.isArray(list)) {
-                    list.forEach(item => {
-                        if (!item) return;
-                        const fileName = typeof item === 'string' ? item : item.file || item.value || item.name;
-                        const label = typeof item === 'object' ? item.label : undefined;
-                        addOption(fileName, label);
-                    });
-                    return;
+                for (const strategy of strategies) {
+                    try {
+                        files = await strategy();
+                        if (files.length) break;
+                    } catch (err) {
+                        // try next strategy
+                    }
                 }
-            } catch (e) {
-                console.log('populateCloudSelect failed:', e);
             }
 
-            // fallback in case files.json is missing
-            addOption('samplef.json', 'أسئلة تجريبية');
-            addOption('generale.json', 'أسئلة عامة');
+            cloudFilesCache = files.slice();
+
+            files
+                .sort((a, b) => a.localeCompare(b, 'ar'))
+                .forEach(fileName => {
+                    const option = document.createElement('option');
+                    option.value = fileName;
+                    option.textContent = normalizeDisplayName(fileName);
+                    option.title = fileName;
+                    select.appendChild(option);
+                });
+
+            if (!files.length) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'لا توجد ملفات JSON داخل questions';
+                option.disabled = true;
+                select.appendChild(option);
+            }
         }
 
         // ============ بدء الاختبار ============
