@@ -933,8 +933,6 @@
                             <label for="cloudSelect" style="color: #fff; font-size: 0.9rem; margin-bottom: 8px; display: block;">اختر ملف من السحابة:</label>
                             <select id="cloudSelect" class="cloud-select">
                                 <option value="">اختر ملف...</option>
-                                <option value="sample.json">أسئلة تجريبية</option>
-                                <option value="general.json">أسئلة عامة</option>
                             </select>
                             <button type="button" id="importCloudConfirmBtn" class="import-option-btn" style="margin-top: 12px;">☁️ استيراد من السحابة</button>
                             <button type="button" id="backToOptionsBtn" class="import-option-btn" style="background: linear-gradient(135deg, #718096 0%, #4a5568 100%); margin-top: 8px;">⬅️ رجوع</button>
@@ -1869,6 +1867,7 @@
             if (!select) return;
 
             select.innerHTML = '<option value="">اختر ملف...</option>';
+            const manifestUrl = './questions/files.json';
             const baseUrl = './questions/';
 
             const addOption = (fileName, label) => {
@@ -1887,44 +1886,57 @@
                 select.appendChild(option);
             };
 
+            const addFromList = list => {
+                if (!Array.isArray(list)) return false;
+                let found = false;
+                list.forEach(item => {
+                    if (!item) return;
+                    const fileName = typeof item === 'string' ? item : item.file || item.value || item.name;
+                    const label = typeof item === 'object' ? item.label : undefined;
+                    addOption(fileName, label);
+                    found = true;
+                });
+                return found;
+            };
+
             try {
-                const response = await fetch(baseUrl);
-                if (!response.ok) throw new Error('لا يمكن قراءة قائمة الملفات');
-
-                const contentType = response.headers.get('content-type') || '';
-                if (contentType.includes('text/html')) {
-                    const html = await response.text();
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const links = Array.from(doc.querySelectorAll('a[href]')).map(a => a.getAttribute('href'));
-                    const files = links
-                        .map(href => {
-                            try {
-                                return href ? decodeURIComponent(href) : href;
-                            } catch (innerError) {
-                                return href;
-                            }
-                        })
-                        .filter(href => href && href.endsWith('.json'));
-                    if (files.length > 0) {
-                        files.forEach(fileName => addOption(fileName));
-                        return;
-                    }
-                }
-
-                if (contentType.includes('application/json')) {
+                const response = await fetch(manifestUrl);
+                if (response.ok) {
                     const list = await response.json();
-                    if (Array.isArray(list)) {
-                        list.forEach(fileName => addOption(fileName));
+                    if (addFromList(list)) {
                         return;
                     }
                 }
             } catch (e) {
-                console.log('populateCloudSelect failed:', e);
+                console.log('populateCloudSelect failed reading files.json:', e);
             }
 
-            addOption('sample.json', 'أسئلة تجريبية');
-            addOption('general.json', 'أسئلة عامة');
+            // on a local server, try directory listing as a fallback if files.json is not available
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                try {
+                    const response = await fetch(baseUrl);
+                    if (response.ok) {
+                        const html = await response.text();
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const links = Array.from(doc.querySelectorAll('a[href]')).map(a => a.getAttribute('href'));
+                        const files = links
+                            .map(href => {
+                                try {
+                                    return href ? decodeURIComponent(href) : href;
+                                } catch (innerError) {
+                                    return href;
+                                }
+                            })
+                            .filter(href => href && href.endsWith('.json'));
+                        if (files.length > 0) {
+                            files.forEach(fileName => addOption(fileName));
+                        }
+                    }
+                } catch (e) {
+                    console.log('populateCloudSelect failed reading local folder listing:', e);
+                }
+            }
         }
 
         // ============ بدء الاختبار ============
