@@ -1,0 +1,19 @@
+[
+  {
+    "question": "ما هو عاصمة فرنسا؟",
+    "answers": ["باريس", "لندن", "روما", "برلين"],
+    "correctAnswer": 0,
+    "type": "mc"
+  },
+  {
+    "question": "هل الشمس نجم؟",
+    "correctTF": true,
+    "type": "tf"
+  },
+  {
+    "question": "ما هو أكبر كوكب في المجموعة الشمسية؟",
+    "answers": ["الأرض", "المريخ", "المشتري", "زحل"],
+    "correctAnswer": 2,
+    "type": "mc"
+  }
+]
