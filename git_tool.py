@@ -23,7 +23,7 @@ class GitApp(ctk.CTk):
         self.repo_dir = self.detect_repo_dir()
 
         self.title("مساعد جيت هاب - SEBAQ")
-        self.geometry("420x460")
+        self.geometry("460x620")
 
         # العنوان
         self.label = ctk.CTkLabel(self, text="لوحة تحكم Git", font=("Arial", 24, "bold"))
@@ -71,6 +71,13 @@ class GitApp(ctk.CTk):
         self.commit_label.pack(pady=(12, 4))
         self.commit_entry = ctk.CTkEntry(self, placeholder_text="مثال: تحديث أسئلة جديدة")
         self.commit_entry.pack(padx=20, fill="x")
+
+        self.log_label = ctk.CTkLabel(self, text="سجل العمليات:")
+        self.log_label.pack(pady=(14, 4))
+        self.log_box = ctk.CTkTextbox(self, height=180)
+        self.log_box.pack(padx=20, pady=(0, 12), fill="both", expand=True)
+        self.log_box.insert("1.0", "جاهز.\n")
+        self.log_box.configure(state="disabled")
 
         # حالة الرفع
         self.status = ctk.CTkLabel(self, text="الحالة: جاهز", text_color="gray")
@@ -120,6 +127,12 @@ class GitApp(ctk.CTk):
             details = "Unknown git error"
         return f"{step_name} failed:\n{details}"
 
+    def append_log(self, message):
+        self.log_box.configure(state="normal")
+        self.log_box.insert("end", message.strip() + "\n\n")
+        self.log_box.see("end")
+        self.log_box.configure(state="disabled")
+
     def get_commit_message(self, default_message):
         user_message = self.commit_entry.get().strip()
         msg = user_message if user_message else default_message
@@ -137,34 +150,41 @@ class GitApp(ctk.CTk):
     def run_git_flow(self, add_args, default_commit_message):
         try:
             branch_name = self.detect_branch_name()
+            self.append_log(f"بدء العملية على الفرع: {branch_name}")
 
             add_result = self.run_git(add_args)
             if add_result.returncode != 0:
                 raise RuntimeError(self.build_error("git add/rm", add_result))
+            self.append_log("تم تنفيذ add/rm بنجاح.")
 
             has_staged = self.run_git(["diff", "--cached", "--quiet"])
             if has_staged.returncode == 0:
                 messagebox.showinfo("معلومة", "لا توجد تغييرات جديدة للرفع.")
                 self.status.configure(text="الحالة: لا توجد تغييرات", text_color="gray")
+                self.append_log("لا توجد تغييرات جديدة بعد add/rm.")
                 return
 
             commit_message = self.get_commit_message(default_commit_message)
             commit_result = self.run_git(["commit", "-m", commit_message])
             if commit_result.returncode != 0:
                 raise RuntimeError(self.build_error("git commit", commit_result))
+            self.append_log(f"تم إنشاء commit: {commit_message}")
 
             push_result = self.run_git(["push", "origin", branch_name])
             if push_result.returncode != 0:
                 raise RuntimeError(self.build_error("git push", push_result))
+            self.append_log(f"تم push بنجاح إلى origin/{branch_name}")
 
             messagebox.showinfo("نجاح", "تم الرفع بنجاح إلى GitHub!")
             self.status.configure(text="الحالة: تم الرفع بنجاح", text_color="green")
         except Exception as e:
+            self.append_log(f"فشل العملية:\n{e}")
             messagebox.showerror("خطأ", f"فشل الرفع:\n{e}")
             self.status.configure(text="الحالة: فشل الرفع", text_color="red")
 
     def update_all(self):
         self.status.configure(text="جاري الرفع...", text_color="orange")
+        self.append_log("طلب: تحديث كل الملفات.")
         self.run_git_flow(["add", "-A"], "تحديث تلقائي شامل")
 
     def update_file(self):
@@ -176,6 +196,7 @@ class GitApp(ctk.CTk):
                 return
 
             self.status.configure(text=f"جاري رفع {relative_file}...", text_color="orange")
+            self.append_log(f"طلب: رفع ملف واحد: {relative_file}")
             self.run_git_flow(
                 ["add", "--", relative_file],
                 f"تحديث ملف: {relative_file}"
@@ -203,6 +224,7 @@ class GitApp(ctk.CTk):
             return
 
         self.status.configure(text=f"جاري حذف {relative_file}...", text_color="orange")
+        self.append_log(f"طلب: حذف ملف: {relative_file}")
         self.run_git_flow(
             ["rm", "--", relative_file],
             f"حذف ملف: {relative_file}"
@@ -212,12 +234,15 @@ class GitApp(ctk.CTk):
         self.status.configure(text="جاري push فقط...", text_color="orange")
         try:
             branch_name = self.detect_branch_name()
+            self.append_log(f"طلب: push فقط إلى origin/{branch_name}")
             result = self.run_git(["push", "origin", branch_name])
             if result.returncode != 0:
                 raise RuntimeError(self.build_error("git push", result))
+            self.append_log(f"تم push فقط بنجاح إلى origin/{branch_name}")
             messagebox.showinfo("نجاح", "تم تنفيذ push بنجاح.")
             self.status.configure(text="الحالة: تم push بنجاح", text_color="green")
         except Exception as e:
+            self.append_log(f"فشل push:\n{e}")
             messagebox.showerror("خطأ", f"فشل push:\n{e}")
             self.status.configure(text="الحالة: فشل push", text_color="red")
 
