@@ -1,0 +1,410 @@
+[
+    {
+        "id": "q1",
+        "type": "mc",
+        "question": "مواد البناء ....هي العناصر الاساسية المكونة للمبني وبدونها لا يقوم المبني",
+        "answers": [
+            "التقليدية",
+            "الثانوية",
+            "الحديثة",
+            "1&3"
+        ],
+        "correctAnswer": 0,
+        "mainHeading": "مواد البناء التقليدية",
+        "subHeading": null
+    },
+    {
+        "id": "q2",
+        "type": "mc",
+        "question": "من امثلة مولد البناء التقليدية",
+        "answers": [
+            "الحجر",
+            "الطوب اللبن & الطوب الاحمر المحروق \"اجر\"",
+            "الخشب",
+            "كل ما سبق"
+        ],
+        "correctAnswer": 3,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q3",
+        "type": "mc",
+        "question": "الحجر هو اكثر مواد البناء استخداما واقدمها  في المعابد والمباني لقوته العالية ومقاومته للعوامل الجوية مثل ...",
+        "answers": [
+            "حجر جيري",
+            "حجر رملي",
+            "جرانيت",
+            "كل ما سبق"
+        ],
+        "correctAnswer": 3,
+        "mainHeading": null,
+        "subHeading": "الحجر"
+    },
+    {
+        "id": "q4",
+        "type": "mc",
+        "question": "من مميزات الحجر ... لكنه ضغيف في مقاومة الشد",
+        "answers": [
+            "عالي الكثافة",
+            "مقاومة للضغط & الديمومة",
+            "العزل الحراري",
+            "كل ما سبق"
+        ],
+        "correctAnswer": 3,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q5",
+        "type": "mc",
+        "question": ".....يتكون من كربونات الكالسيوم بشكل اساسي وهو الاكثر استخداما في مصر القديمة لتوفره وسهولة النحت والتشكيل",
+        "answers": [
+            "الحجر الجيري",
+            "الحجر الرملي",
+            "الجرانيت",
+            "البازلت"
+        ],
+        "correctAnswer": 0,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q6",
+        "type": "mc",
+        "question": "يتكون .....من السيلكا ويتميز بمسامية عالية وتنوع الوانه",
+        "answers": [
+            "الحجر الجيري",
+            "الحجر الرملي",
+            "الجرانيت",
+            "البازلت"
+        ],
+        "correctAnswer": 1,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q7",
+        "type": "mc",
+        "question": "....حجر ناري جوفي صلب جدا  يستخدم في القواعد والاعمدة لتحمل الاوزان الضخمة",
+        "answers": [
+            "الحجر الجيري",
+            "الحجر الرملي",
+            "الجرانيت",
+            "البازلت"
+        ],
+        "correctAnswer": 2,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q8",
+        "type": "mc",
+        "question": "الطوب اللبن عبارة عن قوالب مصنوعة من خليط .... +ماء تصب في قوالب خشبية وتجفف في الشمس او في افران لزيادة متانته",
+        "answers": [
+            "طمي",
+            "رمل",
+            "مادة رابة نباتية (قش)",
+            "كل ما سبق"
+        ],
+        "correctAnswer": 3,
+        "mainHeading": null,
+        "subHeading": "الطوب اللبن"
+    },
+    {
+        "id": "q9",
+        "type": "mc",
+        "question": "يتميز الطوب اللبن بال...وهو مادة منفذة للهواء لدنة قبل الجفاف صلبة بعده",
+        "answers": [
+            "هيجروسكوبية",
+            "قلة التكلفة",
+            "التوافق البيئي",
+            "كل ما سبق"
+        ],
+        "correctAnswer": 0,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q10",
+        "type": "tf",
+        "question": "يعتبر الحجر الجيري افضل مادة تحقق راحة حرارية للمباني في المناطق الحارة والجافة",
+        "correctTF": false,
+        "correction": "الطوب اللبن",
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q11",
+        "type": "mc",
+        "question": "....طوب طيني ينضج في افران تحت درجات حرارى تتجاوز 1000 درجة",
+        "answers": [
+            "الحجر الجيري",
+            "الطوب اللبن",
+            "الطوب الاحمر الاجر",
+            "غير متوفر"
+        ],
+        "correctAnswer": 2,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q12",
+        "type": "mc",
+        "question": "يتميز الطوب الاحمر الاجر ب ....",
+        "answers": [
+            "الثبات الكيميائي(لا يتاثر بالماء بعد الحرق)",
+            "مسامية اقل من الطوب اللبن",
+            "صلابة ومقاومة ميكانيكة اعلي من الطول اللبن",
+            "كل ما سبق"
+        ],
+        "correctAnswer": 3,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q13",
+        "type": "mc",
+        "question": "يعتبر ....المادة الوحيدة في البناء التقليدي لباي تقاوم الشد كما ان خفة وزنه تجعله مثاليا لتغطية المساحات الكبيرة",
+        "answers": [
+            "الحجر",
+            "الطوب اللبن",
+            "الاجر",
+            "الخشب"
+        ],
+        "correctAnswer": 3,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q14",
+        "type": "tf",
+        "question": "يستخدم الخشب في كعنصر انشائي اسقف واعمدة والارضية او كعنصر ثانوي مكمل مثل الابوال والشابيك",
+        "correctTF": true,
+        "correction": null,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q15",
+        "type": "mc",
+        "question": "مواد البناء ...هي المواد المكملة التي تساعد علي ربط عناصر المبني ببعضه واعطاء شكل جمالي وزخرفي",
+        "answers": [
+            "التقليدية",
+            "الثانوية",
+            "الجديثة",
+            "1&3"
+        ],
+        "correctAnswer": 1,
+        "mainHeading": "مواد البناء الثانوية",
+        "subHeading": null
+    },
+    {
+        "id": "q16",
+        "type": "mc",
+        "question": "من امثلة المواد الثانوية",
+        "answers": [
+            "المونة",
+            "البلاستر",
+            "الاضافات",
+            "كل ما سبق"
+        ],
+        "correctAnswer": 3,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q17",
+        "type": "mc",
+        "question": "المادة الوسيطة التي تملئ الفراغات بين وحدات البناء",
+        "answers": [
+            "المونة",
+            "اليلاستر",
+            "الاضافات",
+            "الدهان"
+        ],
+        "correctAnswer": 0,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q18",
+        "type": "mc",
+        "question": "تتكون المونة من .....+ ماء الخلط",
+        "answers": [
+            "مادة رابطة(جبس - جير - طين)",
+            "مادة مالئة(رمل)",
+            "اضافة",
+            "كل ما سبق"
+        ],
+        "correctAnswer": 3,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q19",
+        "type": "tf",
+        "question": "تسمي المونة باسم المادة المالئة",
+        "correctTF": false,
+        "correction": "المادة الرابطة",
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q20",
+        "type": "mc",
+        "question": "تحافظ .....علي حجم المونة في الوضع الطبقي دون انكماش يحدث شروخ",
+        "answers": [
+            "المادة الرابطة",
+            "المادة المالئة",
+            "الاضافات",
+            "كل ما سبق"
+        ],
+        "correctAnswer": 1,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q21",
+        "type": "tf",
+        "question": "يقابل المايكروفيل الرمل حديثا كمادة مالئة ولا يحدث ثقل",
+        "correctTF": true,
+        "correction": null,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q22",
+        "type": "tf",
+        "question": "يجب ان تكون قوة المونة اقل من قوة مواد البناء نفسها لتسمح بحركات المبني الطفيفة دون كسر",
+        "correctTF": true,
+        "correction": null,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q23",
+        "type": "mc",
+        "question": "يجب ان لا تزيد المادة الرابطة عن ....%",
+        "answers": [
+            "10",
+            "25",
+            "50",
+            "80"
+        ],
+        "correctAnswer": 2,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q24",
+        "type": "tf",
+        "question": "اذا زاد الرمل عن حده المونة تفرول",
+        "correctTF": true,
+        "correction": null,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q25",
+        "type": "mc",
+        "question": "من امثلة الاضافات",
+        "answers": [
+            "التين",
+            "مسحوق الجير & مسحوق الفخار",
+            "رماد الفرن",
+            "كل ما سبق"
+        ],
+        "correctAnswer": 3,
+        "mainHeading": null,
+        "subHeading": "الاضافات"
+    },
+    {
+        "id": "q26",
+        "type": "mc",
+        "question": "يستعمل....كتسليح داخلي يزيد من قوة تماسك الطوب اللبن",
+        "answers": [
+            "التبن",
+            "بودرة الفخار",
+            "مسحوق الحجر الاحمر",
+            "رماد الفرن"
+        ],
+        "correctAnswer": 0,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q27",
+        "type": "mc",
+        "question": "يستخدم ....في زيادة تماسك المونة حيث يسد المسام ويجعلها اكثر صمودا امام الاملاح",
+        "answers": [
+            "التبن",
+            "بودرة الفخار",
+            "مسحوق الحجر الاحمر",
+            "رماد الفرن"
+        ],
+        "correctAnswer": 3,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q28",
+        "type": "mc",
+        "question": "يحول.....المونة العادية الي مونة هيدرولوكية تتصلب في الماء وهي تقنية رومانية قديمة انتشرت في العمارة الاسلامية خاصة الحممات",
+        "answers": [
+            "التبن",
+            "بودرة الفخار",
+            "مسحوق الحجر الاحمر  & مسحوق الفخار",
+            "مسحوق الجير"
+        ],
+        "correctAnswer": 2,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q29",
+        "type": "mc",
+        "question": "يحسن ...قابلية التشغيل للمونة ويجعلها اكثر مرونة ومقاومة للفطريات",
+        "answers": [
+            "التبن",
+            "بودرة الفخار",
+            "مسحوق الحجر الاحمر  & مسحوق الفخار",
+            "مسحوق الجير"
+        ],
+        "correctAnswer": 3,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q30",
+        "type": "mc",
+        "question": "....طبقة خارجية رقيقة 2-5سم تغلف الحائظ مكونة من ( جير+ رمل +ماء)",
+        "answers": [
+            "المونة",
+            "الاضافات",
+            "اليلاستر",
+            "1&3"
+        ],
+        "correctAnswer": 2,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q31",
+        "type": "tf",
+        "question": "وظيقة البلاستر حماية الطوب خاصة الضعيق من النحر بالرياح والامطار واضفاء قيمة جمالية للمبني",
+        "correctTF": true,
+        "correction": null,
+        "mainHeading": null,
+        "subHeading": null
+    },
+    {
+        "id": "q32",
+        "type": "tf",
+        "question": "الاختلاف بين المونة والبلاستر ان المونة مكوناتها خشنة لربط المكونات ببعضها بينما البلاستر ناعم ورقيق للتكسية",
+        "correctTF": true,
+        "correction": null,
+        "mainHeading": null,
+        "subHeading": null
+    }
+]
