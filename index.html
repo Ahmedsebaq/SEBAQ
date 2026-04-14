@@ -39,10 +39,16 @@
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
-            gap: 28px;
-            padding: 120px 20px 40px;
+            gap: 12px;
+            padding: 250px 20px 24px;
             min-height: 100%;
             position: relative;
+            overflow: hidden;
+        }
+
+        #importScreen.import-expanded {
+            justify-content: flex-start;
+            padding-top: 72px;
         }
 
         #importScreen::after {
@@ -172,13 +178,17 @@
             border-radius: 28px;
             padding: 28px 26px;
             box-shadow: 0 22px 70px rgba(0, 0, 0, 0.28);
-            max-width: 420px;
+            max-width: 460px;
             width: 100%;
             margin: 0 auto;
             border: 1px solid rgba(255, 255, 255, 0.16);
             backdrop-filter: blur(20px);
             position: relative;
             z-index: 1;
+            max-height: min(72dvh, 640px);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .import-card .import-actions {
@@ -186,6 +196,8 @@
             flex-direction: column;
             gap: 16px;
             margin-top: 22px;
+            min-height: 0;
+            flex: 1;
         }
 
         .import-options {
@@ -193,6 +205,7 @@
             flex-direction: column;
             gap: 12px;
             animation: fadeIn 0.3s ease;
+            min-height: 0;
         }
 
         .import-option-btn {
@@ -219,6 +232,7 @@
             flex-direction: column;
             gap: 8px;
             animation: fadeIn 0.3s ease;
+            min-height: 0;
         }
 
         .cloud-select {
@@ -235,6 +249,79 @@
         .cloud-select option {
             background: #2d3748;
             color: #fff;
+        }
+
+        .cloud-path {
+            display: none;
+        }
+
+        .cloud-browser-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .cloud-small-btn {
+            border: none;
+            border-radius: 999px;
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            cursor: pointer;
+            color: #fff;
+            font-size: 1.15rem;
+            background: rgba(255,255,255,0.18);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cloud-small-btn[hidden] { display: none; }
+
+        .cloud-sub-options {
+            max-height: 360px;
+            overflow: hidden;
+        }
+
+        .cloud-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 170px; /* ~3 items then scroll */
+            overflow-y: auto;
+            padding-right: 2px;
+            min-height: 0;
+        }
+
+        .cloud-item {
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            border-radius: 10px;
+            padding: 9px 10px;
+            text-align: right;
+            cursor: pointer;
+            font-size: 0.86rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cloud-item:hover { background: rgba(255,255,255,0.2); }
+
+        .cloud-item-icon {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .cloud-item-meta {
+            margin-inline-start: auto;
+            opacity: 0.85;
+            font-size: 0.78rem;
+            white-space: nowrap;
         }
 
         .import-card input[type="file"] {
@@ -1218,10 +1305,7 @@
         </div>
 
         <!-- شاشة استيراد الأسئلة -->
-        <div id="importScreen" style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;">
-            <div class="app-title">
-                <h1>📁 استيراد أسئلة</h1>
-            </div>
+        <div id="importScreen" style="flex:1;min-height:0;">
             <div class="import-card">
                 <input type="file" id="jsonFile" accept=".json" aria-label="اختر ملف JSON">
                 <div class="import-actions">
@@ -1230,11 +1314,13 @@
                         <button type="button" id="importLocalBtn" class="import-option-btn">📁 من الملفات</button>
                         <button type="button" id="importCloudBtn" class="import-option-btn">☁️ من السحابة</button>
                         <div id="cloudSubOptions" class="cloud-sub-options" style="display: none;">
-                            <label for="cloudSelect" style="color: #fff; font-size: 0.9rem; margin-bottom: 8px; display: block;">اختر ملف من السحابة:</label>
-                            <select id="cloudSelect" class="cloud-select">
-                                <option value="">اختر ملف...</option>
-                            </select>
-                            <button type="button" id="importCloudConfirmBtn" class="import-option-btn" style="margin-top: 12px;">☁️ استيراد من السحابة</button>
+                            <label style="color: #fff; font-size: 0.9rem; margin-bottom: 8px; display: block;">استعراض ملفات السحابة:</label>
+                            <div id="cloudPath" class="cloud-path">questions</div>
+                            <div class="cloud-browser-actions">
+                                <button type="button" id="cloudFolderBackBtn" class="cloud-small-btn" title="رجوع" hidden>↩️</button>
+                                <button type="button" id="cloudRefreshBtn" class="cloud-small-btn" title="تحديث">🔄</button>
+                            </div>
+                            <div id="cloudList" class="cloud-list"></div>
                             <button type="button" id="backToOptionsBtn" class="import-option-btn" style="background: linear-gradient(135deg, #718096 0%, #4a5568 100%); margin-top: 8px;">⬅️ رجوع</button>
                         </div>
                         <button type="button" id="cancelImportBtn" class="import-option-btn" style="background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);">❌ إلغاء</button>
@@ -1439,6 +1525,9 @@
         let examAnswers = []; // سجل إجابات الامتحان لكل سؤال في الجلسة
         let skipAutoResume = false; // لتجنب الاستئناف التلقائي بعد استيراد ملف جديد
         let cloudFilesCache = null; // cache file list to avoid repeated network calls
+        let cloudCurrentPath = 'questions';
+        let cloudCurrentRef = null;
+        const cloudEntriesCache = new Map();
         /** وضع الملخص العادي: اختيار بالأرقام ثم Enter — { kind:'mc', i } | { kind:'tf', b } */
         let keyboardPending = null;
         let authUser = null;
@@ -2408,164 +2497,296 @@
             reader.readAsText(file);
         }
 
-        // ============ استيراد من السحابة (مجلد محلي أو GitHub) ============
-        async function importFromCloud() {
-            const selectedFile = document.getElementById('cloudSelect').value;
-            if (!selectedFile) {
-                alert('يرجى اختيار ملف من القائمة.');
-                return;
-            }
-
-            // استخدام مسار نسبي إلى مجلد questions في نفس الموقع
-            const baseUrl = './questions/';
-
-            try {
-                const response = await fetch(`${baseUrl}${selectedFile}`);
-                if (!response.ok) {
-                    alert('❌ خطأ في قراءة الملف المختار. تأكد من أن الملف موجود على GitHub.');
-                    return;
-                }
-                const imported = await response.json();
-                if (Array.isArray(imported) && imported.length > 0) {
-                    // مسح الحالة القديمة بالكامل
-                    resetAllState();
-                    skipAutoResume = true;
-                    
-                    // تحميل البيانات الجديدة
-                    questionsBank = imported;
-                    questions = questionsBank.slice();
-                    examMode = false;
-                    examAnswers = [];
-                    localStorage.setItem('quizBank', JSON.stringify(questionsBank));
-
-                    document.getElementById('importScreen').style.display = 'none';
-                    document.getElementById('quizMain').style.display = 'flex';
-                    showQuizFab();
-                    
-                    // بدء جديد مباشرة
-                    skipAutoResume = false;
-                    startQuiz();
-                } else {
-                    alert('❌ الملف لا يحتوي على أسئلة صحيحة.');
-                }
-            } catch (error) {
-                alert('❌ خطأ في قراءة الملف من السحابة: ' + error.message);
-            }
-        }
-
-        async function fetchQuestionsFromManifest() {
-            const response = await fetch('./questions/files.json', { cache: 'no-store' });
-            if (!response.ok) throw new Error('manifest not available');
-            const list = await response.json();
-            if (!Array.isArray(list)) throw new Error('manifest is not an array');
-            const names = list
-                .map(item => {
-                    if (!item) return '';
-                    const fileName = typeof item === 'string' ? item : item.file || item.value || item.name || '';
-                    return fileName.split('/').pop().split('\\').pop();
-                })
-                .filter(name => name && name.toLowerCase().endsWith('.json'));
-            return [...new Set(names)];
-        }
-
-        async function fetchQuestionsFromGitHubApi() {
+        // ============ استيراد من السحابة (GitHub folders/files browser) ============
+        function getGitHubRepoInfo() {
             const host = window.location.hostname || '';
             if (!host.endsWith('.github.io')) {
                 throw new Error('not on github pages host');
             }
-
             const owner = host.replace('.github.io', '');
             const pathParts = window.location.pathname.split('/').filter(Boolean);
             const repo = pathParts.length ? pathParts[0] : owner + '.github.io';
-            const branchHints = ['main', 'master', 'gh-pages'];
+            return { owner, repo };
+        }
 
-            for (const ref of branchHints) {
-                const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/questions?ref=${encodeURIComponent(ref)}`;
+        async function fetchGitHubContents(path, forceRefresh = false) {
+            const cacheKey = `${cloudCurrentRef || 'auto'}:${path}`;
+            if (!forceRefresh && cloudEntriesCache.has(cacheKey)) {
+                return cloudEntriesCache.get(cacheKey).slice();
+            }
+            const { owner, repo } = getGitHubRepoInfo();
+            const refs = cloudCurrentRef ? [cloudCurrentRef] : ['main', 'master', 'gh-pages'];
+            for (const ref of refs) {
+                const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${encodeURIComponent(ref)}`;
                 try {
                     const response = await fetch(apiUrl, { cache: 'no-store' });
                     if (!response.ok) continue;
                     const data = await response.json();
                     if (!Array.isArray(data)) continue;
-                    const names = data
-                        .filter(item => item && item.type === 'file' && /\.json$/i.test(item.name))
-                        .map(item => item.name);
-                    if (names.length) return [...new Set(names)];
+                    cloudCurrentRef = ref;
+                    const entries = data.map(item => ({
+                        name: item.name,
+                        type: item.type,
+                        path: item.path,
+                        download_url: item.download_url || '',
+                        html_url: item.html_url || '',
+                        size: typeof item.size === 'number' ? item.size : null
+                    }));
+                    cloudEntriesCache.set(cacheKey, entries.slice());
+                    return entries;
                 } catch (apiError) {
-                    // try the next branch hint
+                    // try next ref
                 }
             }
-
-            throw new Error('github api listing failed');
+            throw new Error('تعذر قراءة محتويات GitHub API.');
         }
 
-        async function fetchQuestionsFromDirectoryListing() {
-            const response = await fetch('./questions/', { cache: 'no-store' });
-            if (!response.ok) throw new Error('directory listing unavailable');
-            const html = await response.text();
+        async function fetchCloudEntries(path, forceRefresh = false) {
+            const host = window.location.hostname || '';
+            const preferLocal = host === 'localhost' || host === '127.0.0.1';
 
-            // Supports common local-server directory listings (e.g. python http.server, http-server, live-server).
-            const hrefRegex = /href\s*=\s*["']([^"']+\.json(?:\?[^"']*)?)["']/gi;
-            const names = [];
-            let match;
-            while ((match = hrefRegex.exec(html)) !== null) {
-                const rawHref = match[1].split('?')[0];
-                const fileName = rawHref.split('/').pop().split('\\').pop();
-                if (fileName && fileName.toLowerCase().endsWith('.json')) {
-                    names.push(decodeURIComponent(fileName));
-                }
-            }
-
-            if (!names.length) throw new Error('no json files in directory listing');
-            return [...new Set(names)];
-        }
-
-        function normalizeDisplayName(fileName) {
-            return fileName.replace(/\.json$/i, '').replace(/[-_]/g, ' ');
-        }
-
-        async function populateCloudSelect() {
-            const select = document.getElementById('cloudSelect');
-            if (!select) return;
-
-            select.innerHTML = '<option value="">اختر ملف...</option>';
-            let files = cloudFilesCache ? cloudFilesCache.slice() : [];
-
-            if (!files.length) {
-                const strategies = [
-                    fetchQuestionsFromManifest,
-                    fetchQuestionsFromGitHubApi,
-                    fetchQuestionsFromDirectoryListing
-                ];
-
-                for (const strategy of strategies) {
+            if (preferLocal) {
+                try {
+                    return await fetchLocalDirectoryEntries(path);
+                } catch {
                     try {
-                        files = await strategy();
-                        if (files.length) break;
-                    } catch (err) {
-                        // try next strategy
+                        return await fetchManifestEntriesByPath(path);
+                    } catch (localErr) {
+                        throw localErr;
                     }
                 }
             }
 
-            cloudFilesCache = files.slice();
-
-            files
-                .sort((a, b) => a.localeCompare(b, 'ar'))
-                .forEach(fileName => {
-                    const option = document.createElement('option');
-                    option.value = fileName;
-                    option.textContent = normalizeDisplayName(fileName);
-                    option.title = fileName;
-                    select.appendChild(option);
-                });
-
-            if (!files.length) {
-                const option = document.createElement('option');
-                option.value = '';
-                option.textContent = 'لا توجد ملفات JSON داخل questions';
-                option.disabled = true;
-                select.appendChild(option);
+            try {
+                return await fetchGitHubContents(path, forceRefresh);
+            } catch (err) {
+                try {
+                    return await fetchLocalDirectoryEntries(path);
+                } catch {
+                    return await fetchManifestEntriesByPath(path);
+                }
             }
+        }
+
+        async function fetchManifestEntriesByPath(path) {
+            const safePath = String(path || 'questions').replace(/^\/+/, '').replace(/\/+$/, '') || 'questions';
+            const response = await fetch('./questions/files.json', { cache: 'no-store' });
+            if (!response.ok) throw new Error('manifest unavailable');
+
+            const list = await response.json();
+            if (!Array.isArray(list)) throw new Error('invalid manifest format');
+
+            const dirMap = new Map();
+            const fileMap = new Map();
+
+            list.forEach(item => {
+                const rawValue = typeof item === 'string'
+                    ? item
+                    : (item && (item.file || item.value || item.name)) || '';
+                if (!rawValue) return;
+
+                const normalized = String(rawValue).replace(/\\/g, '/').replace(/^\/+/, '').replace(/\/+/g, '/');
+                if (!normalized) return;
+                if (!(normalized === safePath || normalized.startsWith(`${safePath}/`))) return;
+
+                const relativePath = normalized === safePath ? '' : normalized.slice(safePath.length + 1);
+                if (!relativePath) return;
+
+                const segments = relativePath.split('/').filter(Boolean);
+                if (!segments.length) return;
+
+                if (segments.length > 1) {
+                    const dirName = segments[0];
+                    if (!dirMap.has(dirName)) {
+                        dirMap.set(dirName, {
+                            name: dirName,
+                            type: 'dir',
+                            path: `${safePath}/${dirName}`,
+                            download_url: '',
+                            html_url: ''
+                        });
+                    }
+                    return;
+                }
+
+                const fileName = segments[0];
+                if (!/\.(json|pdf)$/i.test(fileName)) return;
+                fileMap.set(fileName, {
+                    name: fileName,
+                    type: 'file',
+                    path: `${safePath}/${fileName}`,
+                    download_url: buildLocalFileUrl(safePath, fileName),
+                    html_url: buildLocalFileUrl(safePath, fileName),
+                    size: null
+                });
+            });
+
+            return [...dirMap.values(), ...fileMap.values()];
+        }
+
+        async function fetchLocalDirectoryEntries(path) {
+            const safePath = String(path || 'questions').replace(/^\/+/, '');
+            const url = `./${safePath}/`;
+            const response = await fetch(url, { cache: 'no-store' });
+            if (!response.ok) throw new Error('local directory listing unavailable');
+            const html = await response.text();
+
+            // Parse href links for local directory listings (python/http-server/live-server).
+            const hrefRegex = /href\s*=\s*["']([^"']+)["']/gi;
+            const entries = [];
+            let match;
+            while ((match = hrefRegex.exec(html)) !== null) {
+                const rawHref = match[1];
+                if (!rawHref || rawHref === '/' || rawHref.startsWith('?') || rawHref.startsWith('#')) continue;
+                let cleaned = rawHref.split('?')[0].split('#')[0];
+                cleaned = decodeURIComponent(cleaned);
+                if (!cleaned || cleaned === '../' || cleaned === '..') continue;
+                const isDir = cleaned.endsWith('/');
+                const name = cleaned.replace(/\/$/, '').split('/').filter(Boolean).pop();
+                if (!name) continue;
+
+                if (isDir) {
+                    entries.push({
+                        name,
+                        type: 'dir',
+                        path: `${safePath}/${name}`,
+                        download_url: '',
+                        html_url: ''
+                    });
+                    continue;
+                }
+                if (!/\.(json|pdf)$/i.test(name)) continue;
+                entries.push({
+                    name,
+                    type: 'file',
+                    path: `${safePath}/${name}`,
+                    download_url: buildLocalFileUrl(safePath, name),
+                    html_url: buildLocalFileUrl(safePath, name),
+                    size: null
+                });
+            }
+            return entries;
+        }
+
+        function buildLocalFileUrl(safePath, fileName) {
+            const parts = [safePath, fileName]
+                .join('/')
+                .split('/')
+                .filter(Boolean)
+                .map(p => encodeURIComponent(p));
+            return './' + parts.join('/');
+        }
+
+        function formatFileSize(bytes) {
+            if (typeof bytes !== 'number' || bytes < 0) return '—';
+            if (bytes < 1024) return `${bytes} B`;
+            const kb = bytes / 1024;
+            if (kb < 1024) return `${kb.toFixed(1)} KB`;
+            const mb = kb / 1024;
+            return `${mb.toFixed(2)} MB`;
+        }
+
+        function getCloudEntryIcon(entry) {
+            if (entry.type === 'dir') return '📁';
+            if (/\.pdf$/i.test(entry.name)) return '📄';
+            if (/\.json$/i.test(entry.name)) return '🧩';
+            return '📎';
+        }
+
+        async function importJsonEntry(entry) {
+            const url = entry.download_url || `./${entry.path}`;
+            const response = await fetch(url, { cache: 'no-store' });
+            if (!response.ok) throw new Error('تعذر تحميل ملف JSON.');
+            const imported = await response.json();
+            if (!Array.isArray(imported) || !imported.length) throw new Error('الملف لا يحتوي على أسئلة صحيحة.');
+
+            resetAllState();
+            skipAutoResume = true;
+            questionsBank = imported;
+            questions = questionsBank.slice();
+            examMode = false;
+            examAnswers = [];
+            localStorage.setItem('quizBank', JSON.stringify(questionsBank));
+
+            document.getElementById('importScreen').style.display = 'none';
+            document.getElementById('quizMain').style.display = 'flex';
+            showQuizFab();
+            skipAutoResume = false;
+            startQuiz();
+        }
+
+        async function handleCloudEntryClick(entry) {
+            if (entry.type === 'dir') {
+                cloudCurrentPath = entry.path;
+                await renderCloudBrowser();
+                return;
+            }
+            if (entry.type === 'file' && /\.json$/i.test(entry.name)) {
+                try {
+                    await importJsonEntry(entry);
+                } catch (e) {
+                    alert('❌ ' + e.message);
+                }
+                return;
+            }
+            if (entry.type === 'file' && /\.pdf$/i.test(entry.name)) {
+                const pdfUrl = entry.download_url || entry.html_url;
+                if (pdfUrl) {
+                    // Shortcut behavior: open/download in browser or device PDF handler
+                    window.open(pdfUrl, '_blank', 'noopener,noreferrer');
+                }
+                else alert('❌ لا يوجد رابط مباشر للملف PDF.');
+                return;
+            }
+            alert('هذا النوع غير مدعوم حالياً.');
+        }
+
+        async function renderCloudBrowser(forceRefresh = false) {
+            const listEl = document.getElementById('cloudList');
+            const pathEl = document.getElementById('cloudPath');
+            const backBtn = document.getElementById('cloudFolderBackBtn');
+            if (!listEl || !pathEl) return;
+
+            pathEl.textContent = cloudCurrentPath;
+            if (backBtn) backBtn.hidden = cloudCurrentPath === 'questions';
+            listEl.innerHTML = '<div class="cloud-item"><span class="cloud-item-icon">⏳</span><span>جاري تحميل المحتوى...</span></div>';
+
+            try {
+                const entries = await fetchCloudEntries(cloudCurrentPath, forceRefresh);
+                const visible = entries
+                    .filter(e => e && (e.type === 'dir' || (e.type === 'file' && /\.(json|pdf)$/i.test(e.name))))
+                    .sort((a, b) => {
+                        if (a.type !== b.type) return a.type === 'dir' ? -1 : 1;
+                        return a.name.localeCompare(b.name, 'ar');
+                    });
+
+                listEl.innerHTML = '';
+                if (!visible.length) {
+                    listEl.innerHTML = '<div class="cloud-item"><span class="cloud-item-icon">📭</span><span>لا يوجد عناصر مدعومة داخل هذا المسار</span></div>';
+                    return;
+                }
+                visible.forEach(entry => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'cloud-item';
+                    const meta = (entry.type === 'file' && /\.pdf$/i.test(entry.name))
+                        ? `<span class="cloud-item-meta">PDF • ${formatFileSize(entry.size)}</span>`
+                        : '';
+                    btn.innerHTML = `<span class="cloud-item-icon">${getCloudEntryIcon(entry)}</span><span>${entry.name}</span>${meta}`;
+                    btn.addEventListener('click', () => handleCloudEntryClick(entry));
+                    listEl.appendChild(btn);
+                });
+            } catch (err) {
+                listEl.innerHTML = '<div class="cloud-item"><span class="cloud-item-icon">⚠️</span><span>تعذر فتح ملفات السحابة على localhost. تأكد من وجود questions/files.json أو تفعيل directory listing.</span></div>';
+            }
+        }
+
+        function goCloudFolderBack() {
+            if (cloudCurrentPath === 'questions') return;
+            const parts = cloudCurrentPath.split('/').filter(Boolean);
+            parts.pop();
+            cloudCurrentPath = parts.length ? parts.join('/') : 'questions';
+            renderCloudBrowser();
         }
 
         // ============ بدء الاختبار ============
@@ -2591,7 +2812,6 @@
         document.getElementById('importBtn').addEventListener('click', () => {
             document.getElementById('importBtn').style.display = 'none';
             document.getElementById('importOptions').style.display = 'flex';
-            populateCloudSelect();
         });
 
         document.getElementById('importLocalBtn').addEventListener('click', () => {
@@ -2605,14 +2825,12 @@
             document.getElementById('importCloudBtn').style.display = 'none';
             document.getElementById('cancelImportBtn').style.display = 'none';
             document.getElementById('cloudSubOptions').style.display = 'flex';
-            populateCloudSelect();
+            cloudCurrentPath = 'questions';
+            renderCloudBrowser();
         });
 
-        document.getElementById('importCloudConfirmBtn').addEventListener('click', () => {
-            document.getElementById('importOptions').style.display = 'none';
-            document.getElementById('importBtn').style.display = 'block';
-            importFromCloud();
-        });
+        document.getElementById('cloudFolderBackBtn').addEventListener('click', goCloudFolderBack);
+        document.getElementById('cloudRefreshBtn').addEventListener('click', () => renderCloudBrowser(true));
 
         document.getElementById('backToOptionsBtn').addEventListener('click', () => {
             document.getElementById('cloudSubOptions').style.display = 'none';
@@ -2716,7 +2934,6 @@
             // إذا لم توجد بيانات محفوظة، أظهر شاشة الاستيراد
             document.getElementById('importScreen').style.display = 'flex';
             document.getElementById('quizMain').style.display = 'none';
-            populateCloudSelect();
         }
 
         function setCachedUser(user) {
