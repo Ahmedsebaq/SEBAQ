@@ -957,6 +957,19 @@
             margin-bottom: 14px;
         }
 
+        #googleLoginBtn[disabled] {
+            opacity: 0.72;
+            cursor: not-allowed;
+            filter: saturate(0.85);
+        }
+
+        .login-status {
+            margin-top: 10px;
+            min-height: 20px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.92);
+        }
+
         .spinner {
             width: 52px;
             height: 52px;
@@ -971,15 +984,16 @@
 
         /* ============ Header UI (Avatar + Dropdown) ============ */
         .app-header {
-            position: sticky;
-            top: 0;
-            z-index: 20;
+            position: fixed;
+            top: 20px;
+            inset-inline-end: 20px; /* right in LTR, left in RTL if needed */
+            z-index: 1000;
             display: none;
             align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 10px 10px;
-            border-radius: 14px;
+            justify-content: flex-end;
+            gap: 0;
+            padding: 6px;
+            border-radius: 999px;
             background: rgba(255, 255, 255, 0.18);
             border: 1px solid rgba(255, 255, 255, 0.22);
             backdrop-filter: blur(10px);
@@ -987,21 +1001,6 @@
         }
 
         .app-header.show { display: flex; }
-
-        .app-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 0;
-        }
-
-        .app-brand .brand-title {
-            font-weight: 700;
-            letter-spacing: 0.2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
 
         .user-menu {
             position: relative;
@@ -1011,10 +1010,10 @@
         }
 
         .avatar-btn {
-            width: 42px;
-            height: 42px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.35);
+            border: 2px solid rgba(255,255,255,0.65);
             background: rgba(0,0,0,0.12);
             padding: 0;
             cursor: pointer;
@@ -1022,6 +1021,12 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .avatar-btn:hover {
+            transform: translateY(-1px) scale(1.04);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
         }
 
         .avatar-btn img {
@@ -1031,24 +1036,128 @@
             display: block;
         }
 
+        .avatar-fallback {
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #fff;
+            background: linear-gradient(135deg, #667eea 0%, #6f5fd0 100%);
+            user-select: none;
+        }
+
         .dropdown {
             position: absolute;
             top: calc(100% + 10px);
             inset-inline-end: 0;
             width: min(320px, 92vw);
-            border-radius: 14px;
-            background: rgba(255, 255, 255, 0.96);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.98);
             color: #1a202c;
-            box-shadow: 0 14px 38px rgba(0,0,0,0.28);
+            box-shadow: 0 14px 38px rgba(0,0,0,0.20);
             border: 1px solid rgba(0,0,0,0.08);
-            padding: 10px 10px 12px;
+            padding: 14px 12px;
             display: none;
         }
 
         .dropdown.show { display: block; }
+        .dropdown-profile {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            text-align: left;
+            padding: 4px 6px 10px;
+        }
+        .dropdown-avatar-wrap {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 0;
+        }
+        .dropdown-avatar,
+        .dropdown-fallback {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+        }
+        .dropdown-avatar {
+            object-fit: cover;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.14);
+            display: none;
+            cursor: zoom-in;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .dropdown-avatar:hover {
+            transform: translateY(-1px) scale(1.03);
+            box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+        }
+        .dropdown-fallback {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #fff;
+            background: linear-gradient(135deg, #667eea 0%, #6f5fd0 100%);
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.14);
+        }
+        .dropdown-details {
+            flex: 1;
+            min-width: 0;
+        }
+        .dropdown .user-name {
+            font-weight: 800;
+            margin-bottom: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .dropdown .user-email {
+            opacity: 0.75;
+            font-size: 0.92rem;
+            margin-bottom: 0;
+            word-break: break-word;
+        }
+        .dropdown hr {
+            border: 0;
+            height: 1px;
+            background: #cbd5e0;
+            margin: 10px 0;
+        }
+        .dropdown hr.name-email-sep {
+            background: #cbd5e0;
+            margin: 8px 0 8px;
+        }
 
-        .dropdown .user-name { font-weight: 800; margin-bottom: 4px; }
-        .dropdown .user-email { opacity: 0.75; font-size: 0.92rem; margin-bottom: 10px; word-break: break-word; }
+        /* Avatar preview modal */
+        .avatar-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px 14px;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+        }
+        .avatar-modal.show { display: flex; }
+        .avatar-modal-card {
+            width: min(520px, 92vw);
+            background: rgba(255,255,255,0.98);
+            border-radius: 18px;
+            padding: 14px;
+            box-shadow: 0 18px 60px rgba(0,0,0,0.35);
+        }
+        .avatar-modal-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 14px;
+        }
 
         .dropdown .signout-btn {
             width: 100%;
@@ -1078,22 +1187,31 @@
             <h2>تسجيل الدخول</h2>
             <p>سجّل الدخول بحساب Google عشان تحفظ تقدمك وتكمل من أي جهاز.</p>
             <button type="button" id="googleLoginBtn" class="import-action-btn" style="width:100%;">🔐 تسجيل الدخول بجوجل</button>
+            <div id="loginStatus" class="login-status"></div>
         </div>
     </div>
 
     <div class="container">
         <!-- Header (shown when signed in) -->
         <div class="app-header" id="appHeader">
-            <div class="app-brand">
-                <div class="brand-title">🎯 SEBAQ</div>
-            </div>
             <div class="user-menu">
                 <button type="button" class="avatar-btn" id="avatarBtn" aria-label="قائمة المستخدم">
                     <img id="userAvatar" alt="" />
+                    <span class="avatar-fallback" id="userAvatarFallback" aria-hidden="true">U</span>
                 </button>
                 <div class="dropdown" id="userDropdown" role="menu" aria-label="حساب المستخدم">
-                    <div class="user-name" id="userName">—</div>
-                    <div class="user-email" id="userEmail">—</div>
+                    <div class="dropdown-profile">
+                        <div class="dropdown-avatar-wrap">
+                            <img id="dropdownUserAvatar" class="dropdown-avatar" alt="" />
+                            <span class="dropdown-fallback" id="dropdownUserFallback" aria-hidden="true">U</span>
+                        </div>
+                        <div class="dropdown-details">
+                            <div class="user-name" id="userName">—</div>
+                            <hr class="name-email-sep">
+                            <div class="user-email" id="userEmail">—</div>
+                        </div>
+                    </div>
+                    <hr>
                     <button type="button" class="signout-btn" id="signOutBtn">تسجيل الخروج</button>
                 </div>
             </div>
@@ -1211,6 +1329,12 @@
         </div><!-- /.quiz-scroll -->
     </div>
 
+    <div id="avatarModal" class="avatar-modal" aria-hidden="true">
+        <div class="avatar-modal-card" role="dialog" aria-label="معاينة صورة المستخدم">
+            <img id="avatarModalImg" alt="User avatar preview" />
+        </div>
+    </div>
+
     <button type="button" class="quiz-menu-fab" id="quizMenuFab" aria-label="قائمة الأسئلة والاختبار">☰</button>
     <div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
     <aside class="quiz-sidebar" id="quizSidebar" aria-hidden="true" dir="rtl">
@@ -1320,6 +1444,7 @@
         let authUser = null;
         let pendingRemoteProgress = null; // progress fetched from Firestore before we load bank
         let progressSyncTimer = null;
+        let appInitialized = false;
 
         // ============ حفظ التقدم (لا يُحفظ أثناء وضع الامتحان) ============
         function saveProgress() {
@@ -1420,22 +1545,105 @@
             document.getElementById('appHeader').classList.add('show');
         }
 
+        function getHighResPhotoURL(url) {
+            if (!url) return '';
+            // Google profile images often include a size token like s96-c.
+            // Replace with a larger size for modal preview clarity.
+            let high = String(url);
+            high = high.replace(/=s\d+-c$/i, '=s512-c');
+            high = high.replace(/=s\d+$/i, '=s512');
+            high = high.replace(/\/s\d+-c\//i, '/s512-c/');
+            high = high.replace(/\/s\d+\//i, '/s512/');
+            return high;
+        }
+
+        function loadImageWithFallback(imgEl, primaryUrl, fallbackUrl, onBothFailed) {
+            if (!imgEl) return;
+            imgEl.onerror = null;
+            imgEl.onload = null;
+            imgEl.dataset.fallbackTried = '0';
+            imgEl.onerror = () => {
+                if (imgEl.dataset.fallbackTried !== '1' && fallbackUrl) {
+                    imgEl.dataset.fallbackTried = '1';
+                    imgEl.src = fallbackUrl;
+                    return;
+                }
+                if (typeof onBothFailed === 'function') onBothFailed();
+            };
+            imgEl.src = primaryUrl || fallbackUrl || '';
+        }
+
         function updateHeaderUser(user) {
             const img = document.getElementById('userAvatar');
+            const fb = document.getElementById('userAvatarFallback');
+            const dImg = document.getElementById('dropdownUserAvatar');
+            const dFb = document.getElementById('dropdownUserFallback');
             const name = document.getElementById('userName');
             const email = document.getElementById('userEmail');
             if (!user) {
-                if (img) img.src = '';
+                if (img) { img.src = ''; img.style.display = 'none'; }
+                if (fb) { fb.style.display = 'flex'; fb.textContent = 'U'; }
+                if (dImg) { dImg.src = ''; dImg.style.display = 'none'; }
+                if (dFb) { dFb.style.display = 'flex'; dFb.textContent = 'U'; }
                 if (name) name.textContent = '—';
                 if (email) email.textContent = '—';
                 return;
             }
-            if (img) {
-                img.src = user.photoURL || '';
+            const display = user.displayName || user.email || 'User';
+            const first = String(display).trim().charAt(0) || 'U';
+            const photo = user.photoURL || '';
+            const photoHigh = getHighResPhotoURL(photo);
+            if (photo && img) {
+                loadImageWithFallback(img, photo, photo, () => {
+                    img.style.display = 'none';
+                    if (fb) { fb.style.display = 'flex'; fb.textContent = first.toUpperCase(); }
+                });
                 img.alt = user.displayName || 'User';
+                img.style.display = 'block';
+                if (fb) fb.style.display = 'none';
+                if (dImg) {
+                    loadImageWithFallback(dImg, photo, photo, () => {
+                        dImg.style.display = 'none';
+                        if (dFb) { dFb.style.display = 'flex'; dFb.textContent = first.toUpperCase(); }
+                    });
+                    dImg.alt = user.displayName || 'User';
+                    dImg.style.display = 'block';
+                    dImg.dataset.full = photoHigh || photo;
+                    dImg.dataset.low = photo;
+                }
+                if (dFb) dFb.style.display = 'none';
+            } else {
+                if (img) { img.src = ''; img.style.display = 'none'; }
+                if (fb) { fb.style.display = 'flex'; fb.textContent = first.toUpperCase(); }
+                if (dImg) { dImg.src = ''; dImg.style.display = 'none'; }
+                if (dFb) { dFb.style.display = 'flex'; dFb.textContent = first.toUpperCase(); }
             }
             if (name) name.textContent = user.displayName || 'مستخدم';
             if (email) email.textContent = user.email || '';
+        }
+
+        function openAvatarModal(url) {
+            const modal = document.getElementById('avatarModal');
+            const img = document.getElementById('avatarModalImg');
+            if (!modal || !img || !url) return;
+            const dImg = document.getElementById('dropdownUserAvatar');
+            const low = dImg ? (dImg.dataset.low || dImg.src || '') : '';
+            // Try high-res first, fallback to original pixelated avatar if needed.
+            loadImageWithFallback(img, url, low, () => {
+                console.warn('Avatar preview failed for both high-res and fallback URLs.');
+                closeAvatarModal();
+            });
+            modal.classList.add('show');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeAvatarModal() {
+            const modal = document.getElementById('avatarModal');
+            const img = document.getElementById('avatarModalImg');
+            if (!modal) return;
+            modal.classList.remove('show');
+            modal.setAttribute('aria-hidden', 'true');
+            if (img) img.src = '';
         }
 
         function wireHeaderMenu() {
@@ -1448,9 +1656,25 @@
                 });
                 document.addEventListener('click', () => dd.classList.remove('show'));
             }
+            const dImg = document.getElementById('dropdownUserAvatar');
+            if (dImg) {
+                dImg.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const url = dImg.dataset.full || dImg.src;
+                    if (url) openAvatarModal(url);
+                });
+            }
+            const modal = document.getElementById('avatarModal');
+            if (modal) {
+                modal.addEventListener('click', () => closeAvatarModal());
+            }
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeAvatarModal();
+            });
             const signOutBtn = document.getElementById('signOutBtn');
             if (signOutBtn) {
                 signOutBtn.addEventListener('click', async () => {
+                    localStorage.setItem('isLoggedIn', 'false');
                     if (typeof window.__firebaseSignOut === 'function') {
                         await window.__firebaseSignOut();
                     }
@@ -2474,23 +2698,13 @@
                         document.getElementById('quizMain').style.display = 'flex';
                         showQuizFab();
                         
-                        // Prefer Firestore progress if available, else localStorage
-                        let applied = false;
-                        if (pendingRemoteProgress) {
-                            applied = applyProgressObject(pendingRemoteProgress);
-                            pendingRemoteProgress = null;
-                        }
-                        if (!applied && savedProgress) {
-                            try { applied = applyProgressObject(JSON.parse(savedProgress)); } catch {}
-                        }
-
-                        // Start immediately; progress (if applied) will move currentQuestion
-                        if (!applied) {
-                            currentQuestion = 0;
-                            correctAnswers = 0;
-                            wrongAnswers = 0;
-                            quizStarted = false;
-                        }
+                        // Always start from main state on fresh open (no auto-resume of last question).
+                        // Keeps UX predictable when app is reopened from scratch.
+                        currentQuestion = 0;
+                        correctAnswers = 0;
+                        wrongAnswers = 0;
+                        quizStarted = false;
+                        pendingRemoteProgress = null;
                         startQuiz();
                         return;
                     }
@@ -2505,6 +2719,49 @@
             populateCloudSelect();
         }
 
+        function setCachedUser(user) {
+            if (!user) return;
+            const payload = {
+                displayName: user.displayName || '',
+                email: user.email || '',
+                photoURL: user.photoURL || ''
+            };
+            localStorage.setItem('cachedAuthUser', JSON.stringify(payload));
+        }
+
+        function getCachedUser() {
+            try {
+                const raw = localStorage.getItem('cachedAuthUser');
+                return raw ? JSON.parse(raw) : null;
+            } catch {
+                return null;
+            }
+        }
+
+        function openHomeFast() {
+            showHomeShell();
+            const cached = getCachedUser();
+            if (cached) updateHeaderUser(cached);
+            else updateHeaderUser({ displayName: 'مستخدم', email: '', photoURL: '' });
+            resetUIToKnownState();
+            document.getElementById('appHeader').classList.add('show');
+            document.getElementById('importScreen').style.display = 'flex';
+            document.getElementById('quizMain').style.display = 'none';
+            if (!appInitialized) {
+                initializeApp();
+                appInitialized = true;
+            }
+        }
+
+        function bootstrapAuthFromLocalStorage() {
+            const isLoggedInLocal = localStorage.getItem('isLoggedIn') === 'true';
+            if (isLoggedInLocal) {
+                openHomeFast();
+            } else {
+                showLoginOnly();
+            }
+        }
+
         // ============ Auth Gate API (called from Firebase module script) ============
         window.__showAuthLoading = function() {
             resetUIToKnownState();
@@ -2516,21 +2773,30 @@
             pendingRemoteProgress = remoteProgress || null;
 
             if (!authUser) {
+                localStorage.setItem('isLoggedIn', 'false');
+                localStorage.removeItem('cachedAuthUser');
                 updateHeaderUser(null);
                 showLoginOnly();
                 return;
             }
 
+            localStorage.setItem('isLoggedIn', 'true');
+            setCachedUser(authUser);
             showHomeShell();
             updateHeaderUser(authUser);
-            resetUIToKnownState();
-            document.getElementById('importScreen').style.display = 'flex';
-            document.getElementById('quizMain').style.display = 'none';
-            initializeApp();
+            if (!appInitialized) {
+                resetUIToKnownState();
+                document.getElementById('appHeader').classList.add('show');
+                document.getElementById('importScreen').style.display = 'flex';
+                document.getElementById('quizMain').style.display = 'none';
+                initializeApp();
+                appInitialized = true;
+            }
         };
 
         // Wire header once DOM exists
         wireHeaderMenu();
+        bootstrapAuthFromLocalStorage();
 
         // Register service worker for PWA
         if ('serviceWorker' in navigator) {
@@ -2548,7 +2814,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
         import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -2565,6 +2831,14 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
+        auth.useDeviceLanguage();
+
+        const allowedLocalDomains = new Set(["localhost", "127.0.0.1"]);
+        if (allowedLocalDomains.has(window.location.hostname)) {
+            console.log(`[Auth Domain Check] Running on ${window.location.hostname}. Make sure this domain exists in Firebase Authorized Domains.`);
+        } else {
+            console.warn(`[Auth Domain Check] Current host "${window.location.hostname}" is not localhost/127.0.0.1. Ensure this host is added in Firebase Authorized Domains.`);
+        }
 
         let analytics = null;
         try {
@@ -2574,34 +2848,146 @@
             console.warn("Analytics could not be initialized in this environment:", err);
         }
 
+        function cacheSignedInUser(user) {
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('cachedAuthUser', JSON.stringify({
+                displayName: user.displayName || '',
+                email: user.email || '',
+                photoURL: user.photoURL || ''
+            }));
+        }
+
         const loginBtn = document.getElementById("googleLoginBtn");
+        const loginStatus = document.getElementById("loginStatus");
+        let loginInFlight = false;
+        function setLoginBusy(isBusy, message = "") {
+            if (loginBtn) {
+                loginBtn.disabled = !!isBusy;
+                loginBtn.textContent = isBusy ? "⏳ جاري تسجيل الدخول..." : "🔐 تسجيل الدخول بجوجل";
+            }
+            if (loginStatus) loginStatus.textContent = message;
+        }
+
+        async function tryGooglePopupThenRedirect() {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                cacheSignedInUser(user);
+                loginInFlight = false;
+                setLoginBusy(false, "");
+                // Apply signed-in UI immediately (do not wait another auth cycle).
+                if (typeof window.__setAuthState === "function") window.__setAuthState(user, null);
+                console.log("Login Success", {
+                    uid: user.uid,
+                    name: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL
+                });
+
+                if (analytics) {
+                    logEvent(analytics, "login", { method: "google_popup" });
+                    logEvent(analytics, "google_login_success", {
+                        login_time: new Date().toISOString(),
+                        uid: user.uid
+                    });
+                }
+                return;
+            } catch (error) {
+                // Full error details for debugging auth problems.
+                console.error("Google Popup Sign-in Error (full object):", error);
+                console.error("Google Popup Sign-in Error fields:", {
+                    code: error?.code,
+                    message: error?.message,
+                    customData: error?.customData,
+                    stack: error?.stack
+                });
+
+                if (analytics) {
+                    logEvent(analytics, "google_login_error", {
+                        code: error?.code || "unknown",
+                        message: error?.message || "unknown",
+                        source: "popup"
+                    });
+                }
+
+                // Don't force redirect for user-cancelled flows; keep button usable.
+                if (error?.code === "auth/popup-closed-by-user" || error?.code === "auth/cancelled-popup-request") {
+                    loginInFlight = false;
+                    setLoginBusy(false, "تم إغلاق النافذة قبل إتمام الدخول. حاول مرة أخرى.");
+                    return;
+                }
+
+                // Redirect fallback only for popup-blocking/environment cases.
+                if (error?.code === "auth/popup-blocked" || error?.code === "auth/operation-not-supported-in-this-environment") {
+                    console.warn("Popup blocked/unsupported, fallback to signInWithRedirect...");
+                    setLoginBusy(true, "جاري تحويلك لإكمال تسجيل الدخول...");
+                    await signInWithRedirect(auth, provider);
+                    return;
+                }
+
+                // For other errors, stop loading and wait for retry.
+                loginInFlight = false;
+                setLoginBusy(false, "فشل تسجيل الدخول. تأكد من إعدادات Firebase ثم حاول مرة أخرى.");
+            }
+        }
         if (loginBtn) {
             loginBtn.addEventListener("click", async () => {
+                if (loginBtn.disabled) return;
+                loginInFlight = true;
+                setLoginBusy(true, "انتظر لحظة... جاري فتح Google");
                 try {
-                    const result = await signInWithPopup(auth, provider);
-                    const user = result.user;
-                    console.log("Google login success:", {
-                        name: user.displayName,
-                        photoURL: user.photoURL
-                    });
-
-                    if (analytics) {
-                        logEvent(analytics, "login", { method: "google" });
-                        logEvent(analytics, "google_login_success", {
-                            login_time: new Date().toISOString(),
-                            uid: user.uid
-                        });
-                    }
-                } catch (error) {
-                    console.error("Google sign-in failed:", error);
-                    if (analytics) {
-                        logEvent(analytics, "google_login_error", {
-                            code: error.code || "unknown",
-                            message: error.message || "unknown"
-                        });
-                    }
+                    await tryGooglePopupThenRedirect();
+                } catch (err) {
+                    console.error("Login flow failed before completion:", err);
+                    loginInFlight = false;
+                    setLoginBusy(false, "فشل تسجيل الدخول. حاول مرة أخرى.");
                 }
             });
+        }
+
+        // If we returned from redirect flow, finalize and log it.
+        try {
+            const redirectResult = await getRedirectResult(auth);
+            if (redirectResult?.user) {
+                const user = redirectResult.user;
+                cacheSignedInUser(user);
+                loginInFlight = false;
+                setLoginBusy(false, "");
+                if (typeof window.__setAuthState === "function") window.__setAuthState(user, null);
+                console.log("Login Success (redirect)", {
+                    uid: user.uid,
+                    name: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL
+                });
+                if (analytics) {
+                    logEvent(analytics, "login", { method: "google_redirect" });
+                    logEvent(analytics, "google_login_success", {
+                        login_time: new Date().toISOString(),
+                        uid: user.uid,
+                        flow: "redirect"
+                    });
+                }
+            } else {
+                if (!loginInFlight) setLoginBusy(false, "");
+            }
+        } catch (error) {
+            console.error("Google Redirect Sign-in Error (full object):", error);
+            console.error("Google Redirect Sign-in Error fields:", {
+                code: error?.code,
+                message: error?.message,
+                customData: error?.customData,
+                stack: error?.stack
+            });
+            if (analytics) {
+                logEvent(analytics, "google_login_error", {
+                    code: error?.code || "unknown",
+                    message: error?.message || "unknown",
+                    source: "redirect"
+                });
+            }
+            loginInFlight = false;
+            setLoginBusy(false, "تعذر إكمال تسجيل الدخول. حاول مرة أخرى.");
         }
 
         async function fetchRemoteProgress(uid) {
@@ -2633,19 +3019,25 @@
         };
 
         window.__firebaseSignOut = async () => {
+            localStorage.setItem('isLoggedIn', 'false');
+            localStorage.removeItem('cachedAuthUser');
             await signOut(auth);
         };
 
-        // Auth gating + loading state to prevent UI flash
-        if (typeof window.__showAuthLoading === "function") window.__showAuthLoading();
+        // Silent background verification after localStorage bootstrap
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
+                // Ignore transient signed_out while popup/redirect login is in progress.
+                if (loginInFlight) return;
+                setLoginBusy(false, "");
                 if (analytics) logEvent(analytics, "auth_state", { state: "signed_out" });
                 if (typeof window.__setAuthState === "function") window.__setAuthState(null, null);
                 return;
             }
 
-            if (analytics) {
+            loginInFlight = false;
+            setLoginBusy(false, "");
+          if (analytics) {
                 logEvent(analytics, "auth_state", { state: "signed_in" });
                 logEvent(analytics, "app_open_signed_in", { openedAt: new Date().toISOString() });
             }
