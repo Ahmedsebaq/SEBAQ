@@ -913,10 +913,192 @@
             outline: 3px solid #667eea;
             outline-offset: 2px;
         }
+
+        .answer-btn.keyboard-pending {
+            border-color: #ed8936;
+            box-shadow: 0 0 0 3px rgba(237, 137, 54, 0.45);
+        }
+
+        /* ============ Auth UX (Loading/Login) ============ */
+        .auth-fullscreen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px 14px;
+            background: radial-gradient(circle at top left, rgba(255,255,255,0.08), transparent 22%),
+                        radial-gradient(circle at bottom right, rgba(255,255,255,0.05), transparent 20%),
+                        linear-gradient(135deg, #2d1747 0%, #4a2d7f 45%, #6f5fd0 100%);
+        }
+
+        .auth-fullscreen.show { display: flex; }
+
+        .auth-card {
+            width: min(520px, 100%);
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.20);
+            border-radius: 18px;
+            padding: 18px 16px;
+            box-shadow: 0 10px 34px rgba(0,0,0,0.35);
+            backdrop-filter: blur(12px);
+            text-align: center;
+        }
+
+        .auth-card h2 {
+            font-size: clamp(1.2rem, 4.4vw, 1.8rem);
+            margin-bottom: 10px;
+        }
+
+        .auth-card p {
+            opacity: 0.9;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .spinner {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.25);
+            border-top-color: rgba(255, 255, 255, 0.95);
+            animation: spin 0.9s linear infinite;
+            margin: 10px auto 0;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ============ Header UI (Avatar + Dropdown) ============ */
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 10px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 26px rgba(0,0,0,0.22);
+        }
+
+        .app-header.show { display: flex; }
+
+        .app-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .app-brand .brand-title {
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-menu {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .avatar-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.35);
+            background: rgba(0,0,0,0.12);
+            padding: 0;
+            cursor: pointer;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            inset-inline-end: 0;
+            width: min(320px, 92vw);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.96);
+            color: #1a202c;
+            box-shadow: 0 14px 38px rgba(0,0,0,0.28);
+            border: 1px solid rgba(0,0,0,0.08);
+            padding: 10px 10px 12px;
+            display: none;
+        }
+
+        .dropdown.show { display: block; }
+
+        .dropdown .user-name { font-weight: 800; margin-bottom: 4px; }
+        .dropdown .user-email { opacity: 0.75; font-size: 0.92rem; margin-bottom: 10px; word-break: break-word; }
+
+        .dropdown .signout-btn {
+            width: 100%;
+            border: 0;
+            border-radius: 12px;
+            padding: 11px 12px;
+            cursor: pointer;
+            color: #fff;
+            font-weight: 700;
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        }
     </style>
 </head>
 <body>
+    <!-- Loading while checking auth state -->
+    <div id="loadingScreen" class="auth-fullscreen show" aria-live="polite">
+        <div class="auth-card">
+            <h2>جاري التحميل…</h2>
+            <p>بنراجع حالة تسجيل الدخول وبنجهّز بياناتك.</p>
+            <div class="spinner" aria-hidden="true"></div>
+        </div>
+    </div>
+
+    <!-- Login page (shown only when signed out) -->
+    <div id="loginScreen" class="auth-fullscreen" aria-live="polite">
+        <div class="auth-card">
+            <h2>تسجيل الدخول</h2>
+            <p>سجّل الدخول بحساب Google عشان تحفظ تقدمك وتكمل من أي جهاز.</p>
+            <button type="button" id="googleLoginBtn" class="import-action-btn" style="width:100%;">🔐 تسجيل الدخول بجوجل</button>
+        </div>
+    </div>
+
     <div class="container">
+        <!-- Header (shown when signed in) -->
+        <div class="app-header" id="appHeader">
+            <div class="app-brand">
+                <div class="brand-title">🎯 SEBAQ</div>
+            </div>
+            <div class="user-menu">
+                <button type="button" class="avatar-btn" id="avatarBtn" aria-label="قائمة المستخدم">
+                    <img id="userAvatar" alt="" />
+                </button>
+                <div class="dropdown" id="userDropdown" role="menu" aria-label="حساب المستخدم">
+                    <div class="user-name" id="userName">—</div>
+                    <div class="user-email" id="userEmail">—</div>
+                    <button type="button" class="signout-btn" id="signOutBtn">تسجيل الخروج</button>
+                </div>
+            </div>
+        </div>
+
         <!-- شاشة استيراد الأسئلة -->
         <div id="importScreen" style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;">
             <div class="app-title">
@@ -1133,6 +1315,11 @@
         let examAnswers = []; // سجل إجابات الامتحان لكل سؤال في الجلسة
         let skipAutoResume = false; // لتجنب الاستئناف التلقائي بعد استيراد ملف جديد
         let cloudFilesCache = null; // cache file list to avoid repeated network calls
+        /** وضع الملخص العادي: اختيار بالأرقام ثم Enter — { kind:'mc', i } | { kind:'tf', b } */
+        let keyboardPending = null;
+        let authUser = null;
+        let pendingRemoteProgress = null; // progress fetched from Firestore before we load bank
+        let progressSyncTimer = null;
 
         // ============ حفظ التقدم (لا يُحفظ أثناء وضع الامتحان) ============
         function saveProgress() {
@@ -1148,6 +1335,29 @@
             };
             localStorage.setItem('quizProgress', JSON.stringify(progress));
             localStorage.setItem('quizBank', JSON.stringify(questionsBank));
+            scheduleSyncProgress(progress);
+        }
+
+        function scheduleSyncProgress(progress) {
+            if (!authUser) return;
+            if (typeof window.__syncProgressToFirestore !== 'function') return;
+            if (progressSyncTimer) clearTimeout(progressSyncTimer);
+            progressSyncTimer = setTimeout(() => {
+                window.__syncProgressToFirestore(progress);
+            }, 500);
+        }
+
+        function applyProgressObject(progress) {
+            if (!progress || progress.isExamData) return false;
+            const bankLen = progress.bankLength != null ? progress.bankLength : progress.questionsLength;
+            if (bankLen === questionsBank.length && progress.questionsLength === questions.length && !examMode) {
+                currentQuestion = progress.currentQuestion || 0;
+                correctAnswers = progress.correctAnswers || 0;
+                wrongAnswers = progress.wrongAnswers || 0;
+                quizStarted = !!progress.quizStarted;
+                return true;
+            }
+            return false;
         }
 
         // ============ تحميل التقدم ============
@@ -1165,12 +1375,9 @@
                     return false;
                 }
                 
+                // keep original validation and apply
                 if (bankLen === questionsBank.length && progress.questionsLength === questions.length && !examMode) {
-                    currentQuestion = progress.currentQuestion;
-                    correctAnswers = progress.correctAnswers;
-                    wrongAnswers = progress.wrongAnswers;
-                    quizStarted = progress.quizStarted;
-                    return true;
+                    return applyProgressObject(progress);
                 }
             }
             return false;
@@ -1184,6 +1391,71 @@
             correctAnswers = 0;
             wrongAnswers = 0;
             quizStarted = false;
+        }
+
+        function resetUIToKnownState() {
+            // Fix cold-start glitch: always start hidden, then auth decides.
+            document.getElementById('importScreen').style.display = 'none';
+            document.getElementById('quizMain').style.display = 'none';
+            document.getElementById('appHeader').classList.remove('show');
+            hideQuizFab();
+            closeQuizSidebar();
+            document.getElementById('finalResult').classList.remove('show');
+        }
+
+        function showLoading() {
+            document.getElementById('loadingScreen').classList.add('show');
+            document.getElementById('loginScreen').classList.remove('show');
+        }
+
+        function showLoginOnly() {
+            resetUIToKnownState();
+            document.getElementById('loadingScreen').classList.remove('show');
+            document.getElementById('loginScreen').classList.add('show');
+        }
+
+        function showHomeShell() {
+            document.getElementById('loadingScreen').classList.remove('show');
+            document.getElementById('loginScreen').classList.remove('show');
+            document.getElementById('appHeader').classList.add('show');
+        }
+
+        function updateHeaderUser(user) {
+            const img = document.getElementById('userAvatar');
+            const name = document.getElementById('userName');
+            const email = document.getElementById('userEmail');
+            if (!user) {
+                if (img) img.src = '';
+                if (name) name.textContent = '—';
+                if (email) email.textContent = '—';
+                return;
+            }
+            if (img) {
+                img.src = user.photoURL || '';
+                img.alt = user.displayName || 'User';
+            }
+            if (name) name.textContent = user.displayName || 'مستخدم';
+            if (email) email.textContent = user.email || '';
+        }
+
+        function wireHeaderMenu() {
+            const avatarBtn = document.getElementById('avatarBtn');
+            const dd = document.getElementById('userDropdown');
+            if (avatarBtn && dd) {
+                avatarBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    dd.classList.toggle('show');
+                });
+                document.addEventListener('click', () => dd.classList.remove('show'));
+            }
+            const signOutBtn = document.getElementById('signOutBtn');
+            if (signOutBtn) {
+                signOutBtn.addEventListener('click', async () => {
+                    if (typeof window.__firebaseSignOut === 'function') {
+                        await window.__firebaseSignOut();
+                    }
+                });
+            }
         }
 
         function shuffleArray(arr) {
@@ -1357,9 +1629,103 @@
             closeQuizSidebar();
         }
 
+        function clearKeyboardPending() {
+            keyboardPending = null;
+            document.querySelectorAll('.answer-btn.keyboard-pending').forEach(b => b.classList.remove('keyboard-pending'));
+        }
+
+        function isTypingInField(el) {
+            if (!el) return false;
+            const t = el.tagName;
+            if (t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT') return true;
+            return el.isContentEditable;
+        }
+
+        function isQuizActiveForShortcuts() {
+            const quizMain = document.getElementById('quizMain');
+            if (!quizMain || quizMain.style.display === 'none') return false;
+            const qc = document.getElementById('questionCard');
+            if (!qc || qc.style.display === 'none') return false;
+            if (document.getElementById('finalResult').classList.contains('show')) return false;
+            if (document.getElementById('sidebarBackdrop').classList.contains('show')) return false;
+            return true;
+        }
+
+        function handleQuizDigitKey(key) {
+            if (!questions.length || currentQuestion < 0 || currentQuestion >= questions.length) return false;
+            const question = questions[currentQuestion];
+            const qType = question.type || 'mc';
+
+            if (examMode) {
+                if (qType === 'tf') {
+                    if (key === '1') { checkAnswerTF(true); return true; }
+                    if (key === '2') { checkAnswerTF(false); return true; }
+                    return false;
+                }
+                const idx = key.charCodeAt(0) - 49;
+                const n = (question.answers || []).length;
+                if (idx >= 0 && idx < n && idx < 4) {
+                    checkAnswer(idx);
+                    return true;
+                }
+                return false;
+            }
+
+            if (answered) return false;
+
+            if (qType === 'tf') {
+                if (key !== '1' && key !== '2') return false;
+                clearKeyboardPending();
+                const buttons = document.querySelectorAll('.answer-btn');
+                const isTrue = key === '1';
+                const sel = isTrue ? buttons[0] : buttons[1];
+                if (sel) {
+                    sel.classList.add('keyboard-pending');
+                    keyboardPending = { kind: 'tf', b: isTrue };
+                }
+                return true;
+            }
+
+            const idx = key.charCodeAt(0) - 49;
+            const answers = question.answers || [];
+            if (idx < 0 || idx >= answers.length || idx >= 4) return false;
+            clearKeyboardPending();
+            const buttons = document.querySelectorAll('.answer-btn');
+            if (buttons[idx]) {
+                buttons[idx].classList.add('keyboard-pending');
+                keyboardPending = { kind: 'mc', i: idx };
+            }
+            return true;
+        }
+
+        function handleQuizEnterKey() {
+            const nextBtn = document.getElementById('nextBtn');
+            const nextVisible = nextBtn && nextBtn.style.display !== 'none';
+
+            if (examMode) {
+                if (nextVisible) {
+                    nextQuestion();
+                    return true;
+                }
+                return false;
+            }
+
+            if (!answered && keyboardPending) {
+                if (keyboardPending.kind === 'mc') checkAnswer(keyboardPending.i);
+                else checkAnswerTF(keyboardPending.b);
+                return true;
+            }
+            if (answered && nextVisible) {
+                nextQuestion();
+                return true;
+            }
+            return false;
+        }
+
         // ============ عرض السؤال ============
         function displayQuestion() {
             answered = false;
+            clearKeyboardPending();
             const question = questions[currentQuestion];
 
             document.getElementById('questionLabel').textContent = `السؤال ${currentQuestion + 1}`;
@@ -1433,6 +1799,7 @@
 
         // ============ فحص إجابات صح/خطأ ============
         function checkAnswerTF(selectedBool) {
+            clearKeyboardPending();
             const question = questions[currentQuestion];
             const buttons = document.querySelectorAll('.answer-btn');
             const feedback = document.getElementById('feedback');
@@ -1540,6 +1907,7 @@
 
         // ============ فحص الإجابة ============
         function checkAnswer(selectedIndex) {
+            clearKeyboardPending();
             const question = questions[currentQuestion];
             const buttons = document.querySelectorAll('.answer-btn');
             const feedback = document.getElementById('feedback');
@@ -2071,7 +2439,20 @@
         });
         document.getElementById('examStartBtn').addEventListener('click', () => startExamSession());
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeQuizSidebar();
+            if (e.key === 'Escape') {
+                closeQuizSidebar();
+                return;
+            }
+            if (isTypingInField(document.activeElement)) return;
+            if (!isQuizActiveForShortcuts()) return;
+
+            if (e.key === 'Enter') {
+                if (handleQuizEnterKey()) e.preventDefault();
+                return;
+            }
+            if (/^[1-4]$/.test(e.key)) {
+                if (handleQuizDigitKey(e.key)) e.preventDefault();
+            }
         });
 
         // ============ بدء التطبيق ============
@@ -2093,28 +2474,23 @@
                         document.getElementById('quizMain').style.display = 'flex';
                         showQuizFab();
                         
-                        if (savedProgress) {
-                            const progress = JSON.parse(savedProgress);
-                            if (!progress.isExamData && progress.questionsLength === questions.length && progress.bankLength === questionsBank.length) {
-                                currentQuestion = progress.currentQuestion || 0;
-                                correctAnswers = progress.correctAnswers || 0;
-                                wrongAnswers = progress.wrongAnswers || 0;
-                                quizStarted = progress.quizStarted || false;
-                                if (quizStarted) {
-                                    document.getElementById('resumeBanner').style.display = 'block';
-                                    document.getElementById('resumeText').textContent = `تم استعادة الجلسة السابقة (السؤال ${currentQuestion + 1}). متابعة...`;
-                                    setTimeout(() => {
-                                        startQuiz();
-                                        document.getElementById('resumeBanner').style.display = 'none';
-                                    }, 3000);
-                                    return;
-                                }
-                            }
+                        // Prefer Firestore progress if available, else localStorage
+                        let applied = false;
+                        if (pendingRemoteProgress) {
+                            applied = applyProgressObject(pendingRemoteProgress);
+                            pendingRemoteProgress = null;
                         }
-                        currentQuestion = 0;
-                        correctAnswers = 0;
-                        wrongAnswers = 0;
-                        quizStarted = false;
+                        if (!applied && savedProgress) {
+                            try { applied = applyProgressObject(JSON.parse(savedProgress)); } catch {}
+                        }
+
+                        // Start immediately; progress (if applied) will move currentQuestion
+                        if (!applied) {
+                            currentQuestion = 0;
+                            correctAnswers = 0;
+                            wrongAnswers = 0;
+                            quizStarted = false;
+                        }
                         startQuiz();
                         return;
                     }
@@ -2129,8 +2505,32 @@
             populateCloudSelect();
         }
 
-        // استدعاء التهيئة عند تحميل الصفحة
-        window.addEventListener('load', initializeApp);
+        // ============ Auth Gate API (called from Firebase module script) ============
+        window.__showAuthLoading = function() {
+            resetUIToKnownState();
+            showLoading();
+        };
+
+        window.__setAuthState = function(user, remoteProgress) {
+            authUser = user || null;
+            pendingRemoteProgress = remoteProgress || null;
+
+            if (!authUser) {
+                updateHeaderUser(null);
+                showLoginOnly();
+                return;
+            }
+
+            showHomeShell();
+            updateHeaderUser(authUser);
+            resetUIToKnownState();
+            document.getElementById('importScreen').style.display = 'flex';
+            document.getElementById('quizMain').style.display = 'none';
+            initializeApp();
+        };
+
+        // Wire header once DOM exists
+        wireHeaderMenu();
 
         // Register service worker for PWA
         if ('serviceWorker' in navigator) {
@@ -2144,6 +2544,115 @@
                     });
             });
         }
+    </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAToEaG_R_mDsaSql_1Nuk3byaO8j7OxFc",
+            authDomain: "sebaq-dashboard.firebaseapp.com",
+            projectId: "sebaq-dashboard",
+            storageBucket: "sebaq-dashboard.firebasestorage.app",
+            messagingSenderId: "1072202278581",
+            appId: "1:1072202278581:web:f1c68a91f0d674e20e40fc",
+            measurementId: "G-CRFKCHTEEC"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        let analytics = null;
+        try {
+            analytics = getAnalytics(app);
+            console.log("Firebase Analytics initialized.");
+        } catch (err) {
+            console.warn("Analytics could not be initialized in this environment:", err);
+        }
+
+        const loginBtn = document.getElementById("googleLoginBtn");
+        if (loginBtn) {
+            loginBtn.addEventListener("click", async () => {
+                try {
+                    const result = await signInWithPopup(auth, provider);
+                    const user = result.user;
+                    console.log("Google login success:", {
+                        name: user.displayName,
+                        photoURL: user.photoURL
+                    });
+
+                    if (analytics) {
+                        logEvent(analytics, "login", { method: "google" });
+                        logEvent(analytics, "google_login_success", {
+                            login_time: new Date().toISOString(),
+                            uid: user.uid
+                        });
+                    }
+                } catch (error) {
+                    console.error("Google sign-in failed:", error);
+                    if (analytics) {
+                        logEvent(analytics, "google_login_error", {
+                            code: error.code || "unknown",
+                            message: error.message || "unknown"
+                        });
+                    }
+                }
+            });
+        }
+
+        async function fetchRemoteProgress(uid) {
+            try {
+                const ref = doc(db, "users", uid, "state", "quizProgress");
+                const snap = await getDoc(ref);
+                if (!snap.exists()) return null;
+                return snap.data()?.progress || null;
+            } catch (e) {
+                console.warn("Failed to fetch remote progress:", e);
+                return null;
+            }
+        }
+
+        // Expose Firestore sync for the non-module script
+        window.__syncProgressToFirestore = async (progress) => {
+            const user = auth.currentUser;
+            if (!user) return;
+            try {
+                const ref = doc(db, "users", user.uid, "state", "quizProgress");
+                await setDoc(ref, {
+                    uid: user.uid,
+                    updatedAt: serverTimestamp(),
+                    progress
+                }, { merge: true });
+            } catch (e) {
+                console.warn("Failed to sync progress to Firestore:", e);
+            }
+        };
+
+        window.__firebaseSignOut = async () => {
+            await signOut(auth);
+        };
+
+        // Auth gating + loading state to prevent UI flash
+        if (typeof window.__showAuthLoading === "function") window.__showAuthLoading();
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                if (analytics) logEvent(analytics, "auth_state", { state: "signed_out" });
+                if (typeof window.__setAuthState === "function") window.__setAuthState(null, null);
+                return;
+            }
+
+            if (analytics) {
+                logEvent(analytics, "auth_state", { state: "signed_in" });
+                logEvent(analytics, "app_open_signed_in", { openedAt: new Date().toISOString() });
+            }
+
+            const remoteProgress = await fetchRemoteProgress(user.uid);
+            if (typeof window.__setAuthState === "function") window.__setAuthState(user, remoteProgress);
+        });
     </script>
 </body>
 </html>
