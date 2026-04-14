@@ -324,6 +324,37 @@
             white-space: nowrap;
         }
 
+        .cloud-progress {
+            display: none;
+            margin-top: 8px;
+        }
+
+        .cloud-progress.show {
+            display: block;
+        }
+
+        .cloud-progress-text {
+            color: #e2e8f0;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .cloud-progress-track {
+            width: 100%;
+            height: 7px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.2);
+            overflow: hidden;
+        }
+
+        .cloud-progress-fill {
+            width: 0%;
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #60a5fa 0%, #34d399 100%);
+            transition: width 0.18s linear;
+        }
+
         .import-card input[type="file"] {
             display: none;
         }
@@ -910,6 +941,29 @@
             background: #edf2f7;
         }
 
+        .sidebar-q-item.state-current {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.18);
+            color: #1e3a8a;
+        }
+
+        .sidebar-q-item.state-correct {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.18);
+            color: #14532d;
+        }
+
+        .sidebar-q-item.state-wrong {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.2);
+            color: #fff;
+        }
+
+        .sidebar-q-item.readonly {
+            cursor: default;
+            opacity: 0.95;
+        }
+
         .sidebar-q-item .q-num {
             font-weight: bold;
             color: #667eea;
@@ -994,6 +1048,76 @@
             font-weight: bold;
             color: #2d3748;
             margin-bottom: 6px;
+        }
+
+        .final-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .final-actions .restart-btn {
+            margin-top: 0;
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .review-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 2600;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px 14px;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(4px);
+        }
+        .review-modal.show { display: flex; }
+        .review-modal-card {
+            width: min(680px, 96vw);
+            max-height: 82dvh;
+            overflow-y: auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 18px 54px rgba(0,0,0,0.34);
+            padding: 14px 12px;
+        }
+        .review-modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #2d3748;
+            font-weight: 800;
+        }
+        .review-close-btn {
+            border: none;
+            border-radius: 8px;
+            padding: 6px 10px;
+            cursor: pointer;
+            background: #edf2f7;
+            color: #2d3748;
+        }
+
+        #examReviewModalList .exam-review-item {
+            color: #1f2937;
+            background: #f1f5f9;
+        }
+
+        #examReviewModalList .exam-review-item.ok {
+            background: rgba(34, 197, 94, 0.16);
+            color: #14532d;
+        }
+
+        #examReviewModalList .exam-review-item.bad {
+            background: rgba(239, 68, 68, 0.16);
+            color: #7f1d1d;
+        }
+
+        #examReviewModalList .exam-review-item strong {
+            color: inherit;
         }
 
         .answer-btn.exam-selected {
@@ -1320,6 +1444,10 @@
                                 <button type="button" id="cloudFolderBackBtn" class="cloud-small-btn" title="رجوع" hidden>↩️</button>
                                 <button type="button" id="cloudRefreshBtn" class="cloud-small-btn" title="تحديث">🔄</button>
                             </div>
+                            <div id="cloudProgress" class="cloud-progress">
+                                <div id="cloudProgressText" class="cloud-progress-text">جاري التحميل...</div>
+                                <div class="cloud-progress-track"><div id="cloudProgressFill" class="cloud-progress-fill"></div></div>
+                            </div>
                             <div id="cloudList" class="cloud-list"></div>
                             <button type="button" id="backToOptionsBtn" class="import-option-btn" style="background: linear-gradient(135deg, #718096 0%, #4a5568 100%); margin-top: 8px;">⬅️ رجوع</button>
                         </div>
@@ -1409,7 +1537,10 @@
                 <h3 style="color:#2d3748;margin-bottom:10px;font-size:1rem;">مراجعة الإجابات</h3>
                 <div id="examReviewList"></div>
             </div>
-            <button class="restart-btn" id="restartQuizBtn" onclick="restartQuiz()">🔄 ابدأ من جديد</button>
+            <div class="final-actions">
+                <button class="restart-btn" id="reviewExamBtn" style="display:none;background:linear-gradient(135deg,#4c51bf 0%,#667eea 100%);">📋 مراجعة الإجابات</button>
+                <button class="restart-btn" id="restartQuizBtn" onclick="restartQuiz()">🔄 ابدأ من جديد</button>
+            </div>
         </div>
 
         </div><!-- /.quiz-scroll -->
@@ -1418,6 +1549,16 @@
     <div id="avatarModal" class="avatar-modal" aria-hidden="true">
         <div class="avatar-modal-card" role="dialog" aria-label="معاينة صورة المستخدم">
             <img id="avatarModalImg" alt="User avatar preview" />
+        </div>
+    </div>
+
+    <div id="examReviewModal" class="review-modal" aria-hidden="true">
+        <div class="review-modal-card" role="dialog" aria-label="مراجعة إجابات الامتحان">
+            <div class="review-modal-head">
+                <span>📋 مراجعة إجابات الامتحان</span>
+                <button type="button" id="closeReviewModalBtn" class="review-close-btn">إغلاق</button>
+            </div>
+            <div id="examReviewModalList"></div>
         </div>
     </div>
 
@@ -1522,12 +1663,15 @@
         let answered = false;
         let quizStarted = false;
         let examMode = false;
+        let lastSessionWasExam = false;
         let examAnswers = []; // سجل إجابات الامتحان لكل سؤال في الجلسة
         let skipAutoResume = false; // لتجنب الاستئناف التلقائي بعد استيراد ملف جديد
         let cloudFilesCache = null; // cache file list to avoid repeated network calls
         let cloudCurrentPath = 'questions';
         let cloudCurrentRef = null;
         const cloudEntriesCache = new Map();
+        let studyAnswers = []; // null|true|false per سؤال في وضع المذاكرة
+        let sidebarMode = 'study'; // study | exam_review
         /** وضع الملخص العادي: اختيار بالأرقام ثم Enter — { kind:'mc', i } | { kind:'tf', b } */
         let keyboardPending = null;
         let authUser = null;
@@ -1615,6 +1759,7 @@
             hideQuizFab();
             closeQuizSidebar();
             document.getElementById('finalResult').classList.remove('show');
+            document.getElementById('finalResult').style.display = 'none';
         }
 
         function showLoading() {
@@ -1758,7 +1903,10 @@
                 modal.addEventListener('click', () => closeAvatarModal());
             }
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') closeAvatarModal();
+                if (e.key === 'Escape') {
+                    closeAvatarModal();
+                    closeExamReviewModal();
+                }
             });
             const signOutBtn = document.getElementById('signOutBtn');
             if (signOutBtn) {
@@ -1846,6 +1994,8 @@
             questions = shuffledOrder.map((bankIdx, i) => cloneQuestionForExam(questionsBank[bankIdx], i));
             examAnswers = questions.map(() => null);
             examMode = true;
+            lastSessionWasExam = true;
+            sidebarMode = 'study';
             currentQuestion = 0;
             correctAnswers = 0;
             wrongAnswers = 0;
@@ -1855,12 +2005,14 @@
             document.getElementById('scorePanel').classList.add('exam-mode');
             document.getElementById('resumeBanner').style.display = 'none';
             document.getElementById('finalResult').classList.remove('show');
+            document.getElementById('finalResult').style.display = 'none';
             document.getElementById('questionCard').style.display = 'block';
             document.getElementById('nextBtn').style.display = 'none';
             document.getElementById('scorePanel').style.display = 'grid';
             document.getElementById('appTitle').style.display = 'block';
             document.getElementById('appTitle').querySelector('h1').textContent = '📋 وضع امتحان';
             document.getElementById('progressTrack').style.display = 'block';
+            document.getElementById('appHeader').classList.remove('show');
             updateStats();
             displayQuestion();
         }
@@ -1879,14 +2031,47 @@
             document.getElementById('quizSidebar').setAttribute('aria-hidden', 'true');
         }
 
+        function getStudyStateByIndex(idx) {
+            if (!Array.isArray(studyAnswers)) return null;
+            return studyAnswers[idx] == null ? null : !!studyAnswers[idx];
+        }
+
+        function refreshSidebarIfOpen() {
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (backdrop && backdrop.classList.contains('show')) {
+                renderSidebarQuestions();
+            }
+        }
+
         function renderSidebarQuestions() {
             const box = document.getElementById('sidebarQuestionsList');
-            if (!box || !questionsBank.length) return;
+            if (!box) return;
             box.innerHTML = '';
+
+            if (sidebarMode === 'exam_review') {
+                questions.forEach((q, idx) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'sidebar-q-item readonly';
+                    const rec = examAnswers[idx];
+                    if (rec && rec.correct === true) btn.classList.add('state-correct');
+                    else if (rec) btn.classList.add('state-wrong');
+                    const snippet = (q.question || '').replace(/\s+/g, ' ').trim().slice(0, 120);
+                    btn.innerHTML = '<span class="q-num">سؤال ' + (idx + 1) + '</span>' + (snippet || '(فارغ)');
+                    box.appendChild(btn);
+                });
+                return;
+            }
+
+            if (!questionsBank.length) return;
             questionsBank.forEach((q, idx) => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'sidebar-q-item';
+                const state = getStudyStateByIndex(idx);
+                if (idx === currentQuestion) btn.classList.add('state-current');
+                else if (state === true) btn.classList.add('state-correct');
+                else if (state === false) btn.classList.add('state-wrong');
                 const snippet = (q.question || '').replace(/\s+/g, ' ').trim().slice(0, 120);
                 btn.innerHTML = '<span class="q-num">سؤال ' + (idx + 1) + '</span>' + (snippet || '(فارغ)');
                 btn.onclick = () => jumpToBankQuestion(idx);
@@ -1899,21 +2084,22 @@
                 if (!confirm('الخروج من وضع الامتحان والانتقال لسؤال في الملخص؟')) return;
             }
             examMode = false;
-            examAnswers = [];
+            lastSessionWasExam = false;
+            sidebarMode = 'study';
             questions = questionsBank.slice();
             currentQuestion = bankIndex;
-            correctAnswers = 0;
-            wrongAnswers = 0;
             answered = false;
             quizStarted = true;
             document.getElementById('scorePanel').classList.remove('exam-mode');
             document.getElementById('appTitle').querySelector('h1').textContent = '🎯 SEBAQ';
             document.getElementById('finalResult').classList.remove('show');
+            document.getElementById('finalResult').style.display = 'none';
             document.getElementById('questionCard').style.display = 'block';
             document.getElementById('nextBtn').style.display = 'none';
             document.getElementById('scorePanel').style.display = 'grid';
             document.getElementById('appTitle').style.display = 'block';
             document.getElementById('progressTrack').style.display = 'block';
+            document.getElementById('appHeader').classList.remove('show');
             closeQuizSidebar();
             updateStats();
             displayQuestion();
@@ -1937,6 +2123,7 @@
             resetAllState();
             document.getElementById('quizMain').style.display = 'none';
             document.getElementById('importScreen').style.display = 'flex';
+            document.getElementById('appHeader').classList.add('show');
             document.getElementById('jsonFile').value = '';
             hideQuizFab();
             closeQuizSidebar();
@@ -2108,6 +2295,7 @@
                     answersGrid.appendChild(button);
                 });
             }
+            refreshSidebarIfOpen();
         }
 
         // ============ فحص إجابات صح/خطأ ============
@@ -2140,14 +2328,14 @@
             buttons.forEach(btn => btn.disabled = true);
 
             if (isCorrect) {
-                correctAnswers++;
+                applyStudyAttemptResult(currentQuestion, true);
                 const selectedBtn = document.getElementById(`${question.id}_${selectedBool ? 'true' : 'false'}`);
                 if (selectedBtn) selectedBtn.classList.add('correct');
                 feedback.textContent = '✅ إجابة صحيحة! رائع!';
                 feedback.className = 'feedback correct show';
                 createConfetti();
             } else {
-                wrongAnswers++;
+                applyStudyAttemptResult(currentQuestion, false);
                 const selectedBtn = document.getElementById(`${question.id}_${selectedBool ? 'true' : 'false'}`);
                 const correctBtn = document.getElementById(`${question.id}_${question.correctTF ? 'true' : 'false'}`);
                 if (selectedBtn) selectedBtn.classList.add('wrong');
@@ -2181,6 +2369,7 @@
             }
 
             updateStats();
+            refreshSidebarIfOpen();
 
             if (currentQuestion < questions.length - 1) {
                 document.getElementById('nextBtn').style.display = 'block';
@@ -2218,6 +2407,15 @@
 
         }
 
+        function applyStudyAttemptResult(bankIndex, isCorrect) {
+            const prev = studyAnswers[bankIndex];
+            if (prev === true) correctAnswers = Math.max(0, correctAnswers - 1);
+            else if (prev === false) wrongAnswers = Math.max(0, wrongAnswers - 1);
+            studyAnswers[bankIndex] = !!isCorrect;
+            if (isCorrect) correctAnswers++;
+            else wrongAnswers++;
+        }
+
         // ============ فحص الإجابة ============
         function checkAnswer(selectedIndex) {
             clearKeyboardPending();
@@ -2247,13 +2445,13 @@
             buttons.forEach(btn => btn.disabled = true);
 
             if (isCorrect) {
-                correctAnswers++;
+                applyStudyAttemptResult(currentQuestion, true);
                 buttons[selectedIndex].classList.add('correct');
                 feedback.textContent = '✅ إجابة صحيحة! رائع!';
                 feedback.className = 'feedback correct show';
                 createConfetti();
             } else {
-                wrongAnswers++;
+                applyStudyAttemptResult(currentQuestion, false);
                 buttons[selectedIndex].classList.add('wrong');
                 buttons[question.correctAnswer].classList.add('correct');
                 feedback.textContent = '❌ إجابة خاطئة! الإجابة الصحيحة هي: ' + question.answers[question.correctAnswer];
@@ -2261,6 +2459,7 @@
             }
 
             updateStats();
+            refreshSidebarIfOpen();
 
             if (currentQuestion < questions.length - 1) {
                 document.getElementById('nextBtn').style.display = 'block';
@@ -2297,11 +2496,12 @@
             const reviewSec = document.getElementById('examReviewSection');
             const reviewList = document.getElementById('examReviewList');
             const restartBtn = document.getElementById('restartQuizBtn');
+            const reviewExamBtn = document.getElementById('reviewExamBtn');
 
             let scoreCount = correctAnswers;
             let pct;
 
-            if (examMode && examAnswers.length) {
+            if (lastSessionWasExam && examAnswers.length) {
                 scoreCount = examAnswers.filter(a => a && a.correct).length;
                 pct = Math.round((scoreCount / questions.length) * 100);
                 correctAnswers = scoreCount;
@@ -2347,11 +2547,13 @@
                     reviewList.appendChild(div);
                 });
                 restartBtn.textContent = '🔄 العودة للملخص العادي';
+                if (reviewExamBtn) reviewExamBtn.style.display = 'inline-flex';
             } else {
                 reviewSec.classList.remove('show');
                 reviewList.innerHTML = '';
                 pct = Math.round((correctAnswers / questions.length) * 100);
                 restartBtn.textContent = '🔄 ابدأ من جديد';
+                if (reviewExamBtn) reviewExamBtn.style.display = 'none';
             }
 
             document.getElementById('finalScore').textContent = `${scoreCount}/${questions.length}`;
@@ -2374,11 +2576,14 @@
             }
 
             document.getElementById('progressFill').style.width = '100%';
+            // Keep inline review hidden; review now opens in popup modal.
+            reviewSec.classList.remove('show');
+            reviewList.innerHTML = '';
             finalResult.classList.add('show');
+            finalResult.style.display = 'block';
 
             if (examMode) {
                 examMode = false;
-                examAnswers = [];
                 document.getElementById('scorePanel').classList.remove('exam-mode');
                 updateStats();
             }
@@ -2388,6 +2593,7 @@
         function restartQuiz() {
             clearProgress();
             examMode = false;
+            lastSessionWasExam = false;
             examAnswers = [];
             questions = questionsBank.slice();
             currentQuestion = 0;
@@ -2397,8 +2603,10 @@
             document.getElementById('scorePanel').classList.remove('exam-mode');
             document.getElementById('appTitle').querySelector('h1').textContent = '🎯 SEBAQ';
             document.getElementById('examReviewSection').classList.remove('show');
+            document.getElementById('reviewExamBtn').style.display = 'none';
             document.getElementById('questionCard').style.display = 'block';
             document.getElementById('finalResult').classList.remove('show');
+            document.getElementById('finalResult').style.display = 'none';
             document.getElementById('restartQuizBtn').textContent = '🔄 ابدأ من جديد';
             updateStats();
             displayQuestion();
@@ -2437,6 +2645,8 @@
             quizStarted = false;
             examMode = false;
             examAnswers = [];
+            studyAnswers = [];
+            sidebarMode = 'study';
             skipAutoResume = true;
             clearProgress();
         }
@@ -2462,6 +2672,7 @@
                         // تحميل البيانات الجديدة
                         questionsBank = imported;
                         questions = questionsBank.slice();
+                        studyAnswers = questionsBank.map(() => null);
                         examMode = false;
                         examAnswers = [];
                         localStorage.setItem('quizBank', JSON.stringify(questionsBank));
@@ -2686,6 +2897,52 @@
             return `${mb.toFixed(2)} MB`;
         }
 
+        function setCloudProgress(active, text = '', pct = 0) {
+            const box = document.getElementById('cloudProgress');
+            const label = document.getElementById('cloudProgressText');
+            const fill = document.getElementById('cloudProgressFill');
+            if (!box || !label || !fill) return;
+            box.classList.toggle('show', !!active);
+            label.textContent = text || 'جاري التحميل...';
+            fill.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+        }
+
+        async function downloadPdfWithProgress(entry) {
+            const pdfUrl = entry.download_url || entry.html_url;
+            if (!pdfUrl) throw new Error('لا يوجد رابط مباشر للملف PDF.');
+            setCloudProgress(true, `جاري تحميل ${entry.name}...`, 0);
+            const response = await fetch(pdfUrl, { cache: 'no-store' });
+            if (!response.ok) throw new Error('تعذر تحميل ملف PDF.');
+            const total = Number(response.headers.get('content-length') || entry.size || 0);
+            if (!response.body) {
+                const blobFallback = await response.blob();
+                const urlFallback = URL.createObjectURL(blobFallback);
+                window.open(urlFallback, '_blank', 'noopener,noreferrer');
+                setTimeout(() => URL.revokeObjectURL(urlFallback), 60000);
+                setCloudProgress(false);
+                return;
+            }
+            const reader = response.body.getReader();
+            const chunks = [];
+            let loaded = 0;
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                chunks.push(value);
+                loaded += value.length;
+                const pct = total > 0 ? Math.round((loaded / total) * 100) : 0;
+                const text = total > 0
+                    ? `تحميل PDF... ${pct}% (${formatFileSize(loaded)} / ${formatFileSize(total)})`
+                    : `تحميل PDF... (${formatFileSize(loaded)})`;
+                setCloudProgress(true, text, pct);
+            }
+            const blob = new Blob(chunks, { type: 'application/pdf' });
+            const blobUrl = URL.createObjectURL(blob);
+            window.open(blobUrl, '_blank', 'noopener,noreferrer');
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+            setCloudProgress(false);
+        }
+
         function getCloudEntryIcon(entry) {
             if (entry.type === 'dir') return '📁';
             if (/\.pdf$/i.test(entry.name)) return '📄';
@@ -2704,6 +2961,7 @@
             skipAutoResume = true;
             questionsBank = imported;
             questions = questionsBank.slice();
+            studyAnswers = questionsBank.map(() => null);
             examMode = false;
             examAnswers = [];
             localStorage.setItem('quizBank', JSON.stringify(questionsBank));
@@ -2730,12 +2988,12 @@
                 return;
             }
             if (entry.type === 'file' && /\.pdf$/i.test(entry.name)) {
-                const pdfUrl = entry.download_url || entry.html_url;
-                if (pdfUrl) {
-                    // Shortcut behavior: open/download in browser or device PDF handler
-                    window.open(pdfUrl, '_blank', 'noopener,noreferrer');
+                try {
+                    await downloadPdfWithProgress(entry);
+                } catch (e) {
+                    setCloudProgress(false);
+                    alert('❌ ' + e.message);
                 }
-                else alert('❌ لا يوجد رابط مباشر للملف PDF.');
                 return;
             }
             alert('هذا النوع غير مدعوم حالياً.');
@@ -2747,6 +3005,7 @@
             const backBtn = document.getElementById('cloudFolderBackBtn');
             if (!listEl || !pathEl) return;
 
+            setCloudProgress(false);
             pathEl.textContent = cloudCurrentPath;
             if (backBtn) backBtn.hidden = cloudCurrentPath === 'questions';
             listEl.innerHTML = '<div class="cloud-item"><span class="cloud-item-icon">⏳</span><span>جاري تحميل المحتوى...</span></div>';
@@ -2789,11 +3048,61 @@
             renderCloudBrowser();
         }
 
+        function buildExamReviewHtml() {
+            if (!questions.length || !examAnswers.length) return '<div class="exam-review-item">لا توجد بيانات مراجعة.</div>';
+            return questions.map((q, i) => {
+                const rec = examAnswers[i];
+                const ok = rec && rec.correct;
+                const qt = q.type || 'mc';
+                let userStr = '—';
+                let correctStr = '—';
+                if (qt === 'tf') {
+                    userStr = rec ? (rec.selected ? 'صح' : 'خطأ') : '—';
+                    correctStr = q.correctTF ? 'صح' : 'خطأ';
+                    if (!q.correctTF && q.correction) correctStr += ' — ' + q.correction;
+                } else {
+                    userStr = rec && q.answers ? (q.answers[rec.selected] || '—') : '—';
+                    correctStr = q.answers && q.correctAnswer != null ? q.answers[q.correctAnswer] : '—';
+                }
+                return `
+                    <div class="exam-review-item ${ok ? 'ok' : 'bad'}">
+                        <div class="er-q">${ok ? '✓' : '✗'} سؤال ${i + 1}</div>
+                        <div>${q.question || ''}</div>
+                        ${ok
+                            ? `<div style="margin-top:6px;"><strong>الصواب: </strong>${correctStr}</div>`
+                            : `<div style="margin-top:6px;"><strong>إجابتك: </strong>${userStr}</div><div><strong>الصواب: </strong>${correctStr}</div>`
+                        }
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openExamReviewModal() {
+            const modal = document.getElementById('examReviewModal');
+            const list = document.getElementById('examReviewModalList');
+            if (!modal || !list) return;
+            list.innerHTML = buildExamReviewHtml();
+            modal.classList.add('show');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeExamReviewModal() {
+            const modal = document.getElementById('examReviewModal');
+            if (!modal) return;
+            modal.classList.remove('show');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
         // ============ بدء الاختبار ============
         function startQuiz() {
             examMode = false;
+            lastSessionWasExam = false;
+            sidebarMode = 'study';
             examAnswers = [];
             questions = questionsBank.slice();
+            if (!studyAnswers.length || studyAnswers.length !== questionsBank.length) {
+                studyAnswers = questionsBank.map(() => null);
+            }
             document.getElementById('scorePanel').classList.remove('exam-mode');
             document.getElementById('appTitle').querySelector('h1').textContent = '🎯 SEBAQ';
             quizStarted = true;
@@ -2802,6 +3111,7 @@
             document.getElementById('appTitle').style.display = 'block';
             document.getElementById('progressTrack').style.display = 'block';
             document.getElementById('questionCard').style.display = 'block';
+            document.getElementById('appHeader').classList.remove('show');
             showQuizFab();
             fillExamScopeSelect();
             updateStats();
@@ -2852,6 +3162,11 @@
 
         // ============ ربط زر التالي ============
         document.getElementById('nextBtn').addEventListener('click', nextQuestion);
+        document.getElementById('reviewExamBtn').addEventListener('click', openExamReviewModal);
+        document.getElementById('closeReviewModalBtn').addEventListener('click', closeExamReviewModal);
+        document.getElementById('examReviewModal').addEventListener('click', (e) => {
+            if (e.target.id === 'examReviewModal') closeExamReviewModal();
+        });
 
         // ============ ربط أزرار الاستئناف ============
         document.getElementById('resumeBtn').addEventListener('click', () => {
@@ -2868,7 +3183,10 @@
 
         document.getElementById('backToImportBtn').addEventListener('click', goBackToImport);
 
-        document.getElementById('quizMenuFab').addEventListener('click', () => openQuizSidebar());
+        document.getElementById('quizMenuFab').addEventListener('click', () => {
+            sidebarMode = 'study';
+            openQuizSidebar();
+        });
         document.getElementById('sidebarBackdrop').addEventListener('click', closeQuizSidebar);
         document.querySelectorAll('.sidebar-tab').forEach(tab => {
             tab.addEventListener('click', () => {
